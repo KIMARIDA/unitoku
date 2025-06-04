@@ -300,6 +300,7 @@ struct PostRow: View {
     let post: Post
     @State private var hasLiked: Bool = false
     @State private var hasCommented: Bool = false
+    @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -314,10 +315,10 @@ struct PostRow: View {
                 .lineLimit(2)
             
             HStack {
-                // 좋아요 수 - 좋아요 눌렀을 때 색상 변경
+                // 좋아요 수 - 버튼 기능 없이 아이콘과 카운트만 표시
                 HStack(spacing: 4) {
-                    Image(systemName: hasLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
-                        .foregroundColor(hasLiked ? Color.appTheme : Color.appTheme.opacity(0.5))
+                    Image(systemName: "hand.thumbsup")
+                        .foregroundColor(Color.appTheme.opacity(0.5))
                         .imageScale(.small)
                     Text("\(post.likeCount)")
                         .font(.caption)
@@ -348,16 +349,8 @@ struct PostRow: View {
         .padding(.horizontal)
         .onAppear {
             // 게시물이 화면에 나타날 때 사용자 상호작용 확인
-            checkIfUserLikedPost()
             checkIfUserCommentedPost()
         }
-    }
-    
-    // 사용자가 해당 게시물에 좋아요를 눌렀는지 확인하는 함수
-    private func checkIfUserLikedPost() {
-        guard let postID = post.id?.uuidString else { return }
-        let likeKey = "liked_\(postID)"
-        hasLiked = UserDefaults.standard.bool(forKey: likeKey)
     }
     
     // 사용자가 해당 게시물에 댓글을 달았는지 확인하는 함수
@@ -407,26 +400,21 @@ struct HotPostCard: View {
             
             Spacer()
             
-            // 좋아요 및 댓글 수만 표시
+            // 좋아요 및 댓글 수만 표시 (버튼 기능 제거)
             HStack {
-                // 좋아요 (엄지 척) 표시 - 사용자가 좋아요 누른 경우 채워진 아이콘과 진한 색상 표시
-                Button(action: {
-                    toggleLike()
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: hasLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
-                            .foregroundColor(hasLiked ? Color.appTheme : Color.appTheme.opacity(0.5))
-                        Text("\(post.likeCount)")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
+                // 좋아요 표시 - 버튼 기능 없이 아이콘과 카운트만 표시
+                HStack(spacing: 4) {
+                    Image(systemName: "hand.thumbsup")
+                        .foregroundColor(Color.appTheme.opacity(0.5))
+                    Text("\(post.likeCount)")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
                 }
-                .buttonStyle(BorderlessButtonStyle())
                 
                 Spacer()
                 
-                // 댓글 수 표시
+                // 댓글 수 표시 - 사용자가 댓글 달았을 때 채워진 아이콘 표시
                 HStack(spacing: 4) {
                     Image(systemName: hasCommented ? "bubble.left.fill" : "bubble.left")
                         .foregroundColor(hasCommented ? Color.appTheme : Color.appTheme.opacity(0.5))
@@ -443,17 +431,9 @@ struct HotPostCard: View {
         .background(Color(.systemGray6))
         .cornerRadius(10)
         .onAppear {
-            // 게시물이 화면에 나타날 때 사용자가 좋아요를 눌렀는지 확인
-            checkIfUserLikedPost()
+            // 게시물이 화면에 나타날 때 사용자가 댓글을 달았는지 확인
             checkIfUserCommentedPost()
         }
-    }
-    
-    // 사용자가 해당 게시물에 좋아요를 눌렀는지 확인하는 함수
-    private func checkIfUserLikedPost() {
-        guard let postID = post.id?.uuidString else { return }
-        let likeKey = "liked_\(postID)"
-        hasLiked = UserDefaults.standard.bool(forKey: likeKey)
     }
     
     // 사용자가 해당 게시물에 댓글을 달았는지 확인하는 함수
@@ -461,34 +441,6 @@ struct HotPostCard: View {
         guard let postID = post.id?.uuidString else { return }
         let commentKey = "commented_\(postID)"
         hasCommented = UserDefaults.standard.bool(forKey: commentKey)
-    }
-    
-    // 좋아요 토글 기능
-    private func toggleLike() {
-        guard let postID = post.id?.uuidString else { return }
-        let likeKey = "liked_\(postID)"
-        
-        // 좋아요 상태 토글
-        hasLiked.toggle()
-        
-        // UserDefaults에 좋아요 상태 저장
-        UserDefaults.standard.set(hasLiked, forKey: likeKey)
-        
-        // 게시물의 좋아요 수 업데이트
-        if hasLiked {
-            post.likeCount += 1
-        } else {
-            if post.likeCount > 0 {
-                post.likeCount -= 1
-            }
-        }
-        
-        // CoreData에 변경사항 저장
-        do {
-            try viewContext.save()
-        } catch {
-            print("좋아요 업데이트 저장 실패: \(error)")
-        }
     }
 }
 
