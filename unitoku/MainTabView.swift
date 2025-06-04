@@ -1,34 +1,81 @@
 import SwiftUI
+import CoreData
 
 struct MainTabView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @State private var selectedTab = 0
+    @State private var navigateToPostId: UUID? = nil
+    @State private var isShowingPostDetail = false
+    
     var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Label("ホーム", systemImage: "house")
+        ZStack {
+            TabView(selection: $selectedTab) {
+                HomeView()
+                    .tabItem {
+                        Label("ホーム", systemImage: "house")
+                    }
+                    .tag(0)
+                
+                TimeTableView()
+                    .tabItem {
+                        Label("時間割", systemImage: "calendar")
+                    }
+                    .tag(1)
+                
+                CourseReviewView()
+                    .tabItem {
+                        Label("授業評価", systemImage: "star")
+                    }
+                    .tag(2)
+                
+                ChatView()
+                    .tabItem {
+                        Label("チャット", systemImage: "message")
+                    }
+                    .tag(3)
+                
+                MoreView()
+                    .tabItem {
+                        Label("もっと", systemImage: "ellipsis.circle")
+                    }
+                    .tag(4)
+            }
+            .accentColor(Color.appTheme)
+            .onAppear {
+                // 네비게이션 알림 리스너 설정
+                NotificationCenter.default.addObserver(
+                    forName: Notification.Name("navigateToPost"),
+                    object: nil,
+                    queue: .main
+                ) { notification in
+                    if let userInfo = notification.userInfo,
+                       let postId = userInfo["postId"] as? UUID {
+                        navigateToPostId = postId
+                        isShowingPostDetail = true
+                    }
                 }
+            }
             
-            TimeTableView()
-                .tabItem {
-                    Label("時間割", systemImage: "calendar")
+            // 게시물 상세 화면을 오버레이로 표시
+            if isShowingPostDetail, let postId = navigateToPostId {
+                NavigationView {
+                    PostDetailView(postId: postId, hideBackButton: true)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .navigationBarItems(leading: Button(action: {
+                            isShowingPostDetail = false
+                        }) {
+                            HStack(spacing: 3) {
+                                Image(systemName: "chevron.left")
+                                Text("戻る")
+                            }
+                            .foregroundColor(Color.appTheme)
+                        })
                 }
-            
-            CourseReviewView()
-                .tabItem {
-                    Label("授業評価", systemImage: "star")
-                }
-            
-            ChatView()
-                .tabItem {
-                    Label("チャット", systemImage: "message")
-                }
-            
-            MoreView()
-                .tabItem {
-                    Label("もっと", systemImage: "ellipsis.circle")
-                }
+                .transition(.move(edge: .trailing))
+                .zIndex(1) // 최상단에 표시
+            }
         }
-        .accentColor(Color.appTheme)
+        .animation(.easeInOut(duration: 0.3), value: isShowingPostDetail)
     }
 }
 

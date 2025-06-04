@@ -14,6 +14,8 @@ struct PostDetailView: View {
     @State private var showingDeleteAlert = false
     @State private var showingEditView = false
     @State private var showingActionSheet = false
+    @State private var post: Post? = nil
+    @State private var isLoading = true
     
     // 편집 모드 상태 및 임시 텍스트
     @State private var editTitle = ""
@@ -25,10 +27,26 @@ struct PostDetailView: View {
     // 현재 사용자 ID (실제 앱에서는 인증 서비스에서 가져옴)
     private let currentUserId = UserDefaults.standard.string(forKey: "currentUserId") ?? "user_1"
     
-    let post: Post
+    // ID로 게시물을 로드하는 생성자 추가
+    let postId: UUID
+    let hideBackButton: Bool
+    
+    init(post: Post, hideBackButton: Bool = false) {
+        self.postId = post.id!
+        self.hideBackButton = hideBackButton
+        self._post = State(initialValue: post)
+        self._isLoading = State(initialValue: false)
+    }
+    
+    init(postId: UUID, hideBackButton: Bool = false) {
+        self.postId = postId
+        self.hideBackButton = hideBackButton
+        self._isLoading = State(initialValue: true)
+    }
     
     // 현재 사용자가 포스트 작성자인지 확인
     private var isAuthor: Bool {
+        guard let post = post else { return false }
         // For debugging
         print("Current User ID: \(currentUserId)")
         print("Post Author ID: \(post.authorId)")
@@ -38,6 +56,7 @@ struct PostDetailView: View {
     }
     
     var commentsArray: [Comment] {
+        guard let post = post else { return [] }
         let comments = post.comments?.allObjects as? [Comment] ?? []
         // 정렬 순서 변경: 이전에는 최신 댓글이 상단에 표시되었지만,
         // 이제 오래된 댓글이 상단에 표시되도록 변경
@@ -47,6 +66,22 @@ struct PostDetailView: View {
     }
     
     var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading...")
+                    .onAppear(perform: loadPost)
+            } else if let post = post {
+                postDetailContent
+            } else {
+                Text("Post not found")
+                    .foregroundColor(.red)
+            }
+        }
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private var postDetailContent: some View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 15) {
@@ -67,7 +102,7 @@ struct PostDetailView: View {
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             
-                            Text(post.timestamp ?? Date(), formatter: itemFormatter)
+                            Text(post?.timestamp ?? Date(), formatter: itemFormatter)
                                 .font(.caption)
                                 .foregroundColor(.gray)
                         }
@@ -91,8 +126,8 @@ struct PostDetailView: View {
                                         .default(Text("編集")
                                             .foregroundColor(.gray)) {
                                             // 편집 시작 시 현재 값 로드
-                                            editTitle = post.title ?? ""
-                                            editContent = post.content ?? ""
+                                            editTitle = post?.title ?? ""
+                                            editContent = post?.content ?? ""
                                             showingEditView = true
                                         },
                                         .destructive(Text("削除")) {
@@ -111,12 +146,12 @@ struct PostDetailView: View {
                     // 게시글 제목과 내용
                     VStack(alignment: .leading, spacing: 10) {
                         // 제목을 프로필 아래로 이동
-                        Text(post.title ?? "タイトルなし")
+                        Text(post?.title ?? "タイトルなし")
                             .font(.title)
                             .fontWeight(.bold)
                             .padding(.horizontal)
                         
-                        Text(post.content ?? "")
+                        Text(post?.content ?? "")
                             .padding()
                             .background(Color.white)
                             .cornerRadius(8)
@@ -124,7 +159,7 @@ struct PostDetailView: View {
                             .padding(.horizontal)
                         
                         // 이미지 갤러리 추가 - 첨부화상 글귀 제거
-                        if post.hasImages && !post.images.isEmpty {
+                        if let post = post, post.hasImages && !post.images.isEmpty {
                             VStack(alignment: .leading) {
                                 // 첨부화상 텍스트 제거
                                 
@@ -204,15 +239,17 @@ struct PostDetailView: View {
                 }
                 .padding(.vertical)
                 .onAppear {
-                    likeCount = post.likeCount
-                    viewCount = post.viewCount
-                    
-                    // 사용자의 투표 상태 불러오기
-                    loadVoteStatus()
-                    
-                    if !hasIncreasedViewCount {
-                        increaseViewCount()
-                        hasIncreasedViewCount = true
+                    if let post = post {
+                        likeCount = post.likeCount
+                        viewCount = post.viewCount
+                        
+                        // 사용자의 투표 상태 불러오기
+                        loadVoteStatus()
+                        
+                        if !hasIncreasedViewCount {
+                            increaseViewCount()
+                            hasIncreasedViewCount = true
+                        }
                     }
                 }
             }
@@ -238,8 +275,6 @@ struct PostDetailView: View {
                 .background(Color.white)
             }
         }
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
         .background(Color.white)
         .alert(isPresented: $showingDeleteAlert) {
             Alert(
@@ -257,18 +292,67 @@ struct PostDetailView: View {
             }
         }
         .sheet(isPresented: $showingEditView) {
-            PostEditView(
-                post: post,
-                title: $editTitle,
-                content: $editContent,
-                isPresented: $showingEditView
-            )
+            if let post = post {
+                PostEditView(
+                    post: post,
+                    title: $editTitle,
+                    content: $editContent,
+                    isPresented: $showingEditView
+                )
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                if !hideBackButton {
+                    Button(action: {
+                        // Force dismiss to the root view
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack(spacing: 3) {
+                            Image(systemName: "chevron.left")
+                            Text("戻る")
+                        }
+                        .foregroundColor(Color.appTheme)
+                    }
+                }
+            }
+        }
+        .navigationBarBackButtonHidden(true)
+    }
+    
+    // ID로 게시물 로드하는 함수
+    private func loadPost() {
+        print("⭐️ Loading post with ID: \(postId)")
+        let fetchRequest: NSFetchRequest<Post> = Post.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", postId as CVarArg)
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try viewContext.fetch(fetchRequest)
+            if let foundPost = results.first {
+                print("✅ Successfully found post: \(foundPost.title ?? "No title") with ID: \(foundPost.id?.uuidString ?? "unknown")")
+                self.post = foundPost
+                self.likeCount = foundPost.likeCount
+                self.viewCount = foundPost.viewCount
+                loadVoteStatus()
+                
+                if !hasIncreasedViewCount {
+                    increaseViewCount()
+                    hasIncreasedViewCount = true
+                }
+            } else {
+                print("❌ Could not find post with ID: \(postId)")
+            }
+            isLoading = false
+        } catch {
+            print("❌ Error loading post: \(error)")
+            isLoading = false
         }
     }
     
     // 사용자가 현재 게시물에 좋아요/싫어요를 눌렀는지 확인하는 함수
     private func loadVoteStatus() {
-        guard let postID = post.id?.uuidString else { return }
+        guard let postID = post?.id?.uuidString else { return }
         
         let likeKey = "liked_\(postID)"
         
@@ -276,14 +360,9 @@ struct PostDetailView: View {
     }
     
     private func likePost() {
-        guard let postID = post.id?.uuidString else { return }
+        guard let post = post else { return }
         
         hasLiked.toggle()
-        
-        // UserDefaults에 좋아요 상태 저장
-        let likeKey = "liked_\(postID)"
-        UserDefaults.standard.set(hasLiked, forKey: likeKey)
-        
         if hasLiked {
             likeCount += 1
             
@@ -297,19 +376,14 @@ struct PostDetailView: View {
             post.likeCount -= 1
             try? viewContext.save()
         }
-        
-        // NotificationCenter를 통해 좋아요 상태 변경 알림
-        NotificationCenter.default.post(
-            name: .postLikeStatusChanged,
-            object: nil,
-            userInfo: ["postID": postID, "hasLiked": hasLiked]
-        )
     }
     
     // dislikePost 함수 제거
     
     // 백엔드 좋아요 카운트 업데이트
     private func updateLikeCount(increment: Bool) {
+        guard let post = post else { return }
+        
         DispatchQueue.global().async {
             let newContext = PersistenceController.shared.container.newBackgroundContext()
             newContext.perform {
@@ -337,6 +411,8 @@ struct PostDetailView: View {
     }
     
     private func increaseViewCount() {
+        guard let post = post else { return }
+        
         viewCount += 1
         
         DispatchQueue.global().async {
@@ -363,6 +439,8 @@ struct PostDetailView: View {
     }
     
     private func addComment() {
+        guard let post = post else { return }
+        
         withAnimation {
             let newComment = Comment(context: viewContext)
             newComment.id = UUID()
@@ -394,6 +472,8 @@ struct PostDetailView: View {
     
     // 게시물 삭제 함수
     private func deletePost() {
+        guard let post = post else { return }
+        
         viewContext.delete(post)
         
         do {

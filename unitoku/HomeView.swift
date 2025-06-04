@@ -111,9 +111,21 @@ struct HomeView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 15) {
                                     ForEach(hotPosts.prefix(5)) { post in
-                                        NavigationLink(destination: PostDetailView(post: post)) {
+                                        Button(action: {
+                                            // 버튼 터치 시 직접 처리하여 해당 게시물로 이동
+                                            print("🔥 이동 시도 (인기): \(post.id?.uuidString ?? "unknown"), 제목: \(post.title ?? "")")
+                                            
+                                            // 새 화면으로 직접 푸시
+                                            NotificationCenter.default.post(
+                                                name: Notification.Name("navigateToPost"),
+                                                object: nil,
+                                                userInfo: ["postId": post.id!]
+                                            )
+                                        }) {
                                             HotPostCard(post: post)
                                         }
+                                        .buttonStyle(PlainButtonStyle())
+                                        .id("hot_\(post.id?.uuidString ?? UUID().uuidString)")
                                     }
                                     
                                     // 投稿がない場合のプレースホルダー表示
@@ -161,8 +173,22 @@ struct HomeView: View {
                             // 게시판 글 목록 - 정렬된 결과 사용
                             LazyVStack(alignment: .leading, spacing: 5) {
                                 ForEach(sortedPosts) { post in
-                                    NavigationLink(destination: PostDetailView(post: post)) {
+                                    Button(action: {
+                                        // 버튼 터치 시 직접 처리하여 해당 게시물로 이동
+                                        print("📝 이동 시도: \(post.id?.uuidString ?? "unknown"), 제목: \(post.title ?? "")")
+                                        
+                                        // 0.1초 후에 화면 전환 (UI 처리 시간 확보)
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            // 새 화면으로 직접 푸시 (별도 대리자 구현 필요)
+                                            NotificationCenter.default.post(
+                                                name: Notification.Name("navigateToPost"),
+                                                object: nil,
+                                                userInfo: ["postId": post.id!]
+                                            )
+                                        }
+                                    }) {
                                         PostRow(post: post)
+                                            .contentShape(Rectangle())
                                     }
                                     .buttonStyle(PlainButtonStyle())
                                     
