@@ -211,13 +211,13 @@ struct HomeView: View {
                     VStack {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle())
+                            .tint(Color.appTheme)
                             .scaleEffect(1.5)
                             .padding(8)
                             .background(Color(.systemBackground).opacity(0.8))
                             .cornerRadius(8)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.top, 20)
                 }
             }
             .navigationTitle("立命館大学")
