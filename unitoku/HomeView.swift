@@ -368,7 +368,7 @@ struct PostRow: View {
                 .lineLimit(2)
             
             HStack {
-                // 좋아요 수 - 사용자가 좋아요 누른 경우 채워진 아이콘 표시
+                // 좋아요 수와 댓글 수를 나란히 배치
                 HStack(spacing: 4) {
                     Image(systemName: hasLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
                         .foregroundColor(hasLiked ? Color.appTheme : Color.appTheme.opacity(0.5))
@@ -378,7 +378,7 @@ struct PostRow: View {
                         .foregroundColor(.secondary)
                 }
                 
-                // 댓글 수 - 댓글 달았을 때 색상 변경
+                // 댓글 아이콘과 카운트를 좋아요 바로 옆으로 이동
                 HStack(spacing: 4) {
                     Image(systemName: hasCommented ? "bubble.left.fill" : "bubble.left")
                         .foregroundColor(hasCommented ? Color.appTheme : Color.appTheme.opacity(0.5))
@@ -387,7 +387,7 @@ struct PostRow: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                .padding(.leading, 8)
+                .padding(.leading, 3) // 좋아요와의 간격 줄임
                 
                 Spacer()
                 
@@ -466,29 +466,31 @@ struct HotPostCard: View {
             
             Spacer()
             
-            // 좋아요 및 댓글 수만 표시 (버튼 기능 제거)
+            // 좋아요 및 댓글 수를 나란히 배치
             HStack {
-                // 좋아요 표시 - 사용자가 좋아요 누른 경우 채워진 아이콘 표시
-                HStack(spacing: 4) {
-                    Image(systemName: hasLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
-                        .foregroundColor(hasLiked ? Color.appTheme : Color.appTheme.opacity(0.5))
-                    Text("\(post.likeCount)")
-                        .font(.caption)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
+                HStack(spacing: 8) {
+                    // 좋아요 표시 - 사용자가 좋아요 누른 경우 채워진 아이콘 표시
+                    HStack(spacing: 4) {
+                        Image(systemName: hasLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
+                            .foregroundColor(hasLiked ? Color.appTheme : Color.appTheme.opacity(0.5))
+                        Text("\(post.likeCount)")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
+                    
+                    // 댓글 수 표시 - 사용자가 댓글 달았을 때 채워진 아이콘 표시
+                    HStack(spacing: 4) {
+                        Image(systemName: hasCommented ? "bubble.left.fill" : "bubble.left")
+                            .foregroundColor(hasCommented ? Color.appTheme : Color.appTheme.opacity(0.5))
+                        Text("\(post.comments?.count ?? 0)")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
                 }
                 
                 Spacer()
-                
-                // 댓글 수 표시 - 사용자가 댓글 달았을 때 채워진 아이콘 표시
-                HStack(spacing: 4) {
-                    Image(systemName: hasCommented ? "bubble.left.fill" : "bubble.left")
-                        .foregroundColor(hasCommented ? Color.appTheme : Color.appTheme.opacity(0.5))
-                    Text("\(post.comments?.count ?? 0)")
-                        .font(.caption)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                }
             }
             .padding(.top, 5)
         }

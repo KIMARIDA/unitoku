@@ -29,7 +29,7 @@ struct LoginView: View {
                 // 로그인 폼
                 VStack(spacing: 20) {
                     // 이메일 입력 필드 - 라벨 제거
-                    TextField("学内メールアドレスを入力", text: $email)
+                    TextField("学内メールアドレス", text: $email)
                         .padding()
                         .background(Color(.systemGray6))
                         .cornerRadius(10)
@@ -39,13 +39,13 @@ struct LoginView: View {
                     // 비밀번호 입력 필드 - 라벨 제거
                     ZStack(alignment: .trailing) {
                         if isPasswordVisible {
-                            TextField("パスワードを入力", text: $password)
+                            TextField("パスワード", text: $password)
                                 .padding()
                                 .background(Color(.systemGray6))
                                 .cornerRadius(10)
                                 .autocapitalization(.none)
                         } else {
-                            SecureField("パスワードを入力", text: $password)
+                            SecureField("パスワード", text: $password)
                                 .padding()
                                 .background(Color(.systemGray6))
                                 .cornerRadius(10)
