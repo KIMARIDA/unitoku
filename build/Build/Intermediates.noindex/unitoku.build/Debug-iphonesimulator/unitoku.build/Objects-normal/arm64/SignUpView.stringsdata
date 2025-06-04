@@ -1,0 +1,160 @@
+{
+  "source": "/Users/junnykim/unitoku/unitoku/SignUpView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "アカウント作成",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 37
+        }
+      },
+      {
+        "comment": "",
+        "key": "フルネームを入力",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "学生証に記載の番号",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 68
+        }
+      },
+      {
+        "comment": "",
+        "key": "学部を選択",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 76
+        }
+      },
+      {
+        "comment": "",
+        "key": "学年を選択",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 90
+        }
+      },
+      {
+        "comment": "",
+        "key": "大学のメールアドレス",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 103
+        }
+      },
+      {
+        "comment": "",
+        "key": "学部を選択",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 77
+        }
+      },
+      {
+        "comment": "",
+        "key": "6文字以上のパスワード",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 114
+        }
+      },
+      {
+        "comment": "",
+        "key": "6文字以上のパスワード",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 120
+        }
+      },
+      {
+        "comment": "",
+        "key": "パスワードを再入力",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 140
+        }
+      },
+      {
+        "comment": "",
+        "key": "パスワードを再入力",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 146
+        }
+      },
+      {
+        "comment": "",
+        "key": "前へ",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 180
+        }
+      },
+      {
+        "comment": "",
+        "key": "登録",
+        "location": {
+          "startingColumn": 68,
+          "startingLine": 200
+        }
+      },
+      {
+        "comment": "",
+        "key": "次へ",
+        "location": {
+          "startingColumn": 79,
+          "startingLine": 200
+        }
+      },
+      {
+        "comment": "",
+        "key": "すでにアカウントをお持ちですか？",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 215
+        }
+      },
+      {
+        "comment": "",
+        "key": "ログイン",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 218
+        }
+      },
+      {
+        "comment": "",
+        "key": "戻る",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 232
+        }
+      },
+      {
+        "comment": "",
+        "key": "エラー",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 238
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 240
+        }
+      }
+    ]
+  },
+  "version": 1
+}

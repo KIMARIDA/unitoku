@@ -1,0 +1,24 @@
+{
+  "source": "/Users/junnykim/unitoku/unitoku/CategoryView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%d",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 53
+        }
+      }
+    ]
+  },
+  "version": 1
+}

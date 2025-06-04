@@ -1,0 +1,18 @@
+"/Users/junnykim/unitoku/unitoku/PostExtension.swift":
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/PostExtension.d"
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/PostExtension.swiftconstvalues"
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/PostExtension.dia"
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/PostExtension.o"
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/PostExtension.swiftdeps"
+"/Users/junnykim/unitoku/unitoku/BoardListView.swift":
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/BoardListView.o"
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/BoardListView.swiftconstvalues"
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/BoardListView.swiftdeps"
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/BoardListView.dia"
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/BoardListView.d"
+"/Users/junnykim/unitoku/unitoku/ProfileView.swift":
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/ProfileView.d"
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/ProfileView.dia"
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/ProfileView.swiftdeps"
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/ProfileView.o"
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/ProfileView.swiftconstvalues"

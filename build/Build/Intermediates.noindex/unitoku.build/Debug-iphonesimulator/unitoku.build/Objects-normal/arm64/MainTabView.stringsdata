@@ -1,0 +1,240 @@
+{
+  "source": "/Users/junnykim/unitoku/unitoku/MainTabView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "ホーム",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 8
+        }
+      },
+      {
+        "comment": "",
+        "key": "時間割",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 13
+        }
+      },
+      {
+        "comment": "",
+        "key": "授業評価",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 18
+        }
+      },
+      {
+        "comment": "",
+        "key": "チャット",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 23
+        }
+      },
+      {
+        "comment": "",
+        "key": "もっと",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 28
+        }
+      },
+      {
+        "comment": "",
+        "key": "時間割",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 48
+        }
+      },
+      {
+        "comment": "",
+        "key": "新しい授業を登録",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "時限",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 83
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "授業詳細",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 223
+        }
+      },
+      {
+        "comment": "",
+        "key": "授業情報",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 191
+        }
+      },
+      {
+        "comment": "",
+        "key": "授業名",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 193
+        }
+      },
+      {
+        "comment": "",
+        "key": "教授",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 199
+        }
+      },
+      {
+        "comment": "",
+        "key": "教室",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 205
+        }
+      },
+      {
+        "comment": "",
+        "key": "曜日・時限",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@曜 %lld限",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 213
+        }
+      },
+      {
+        "comment": "",
+        "key": "時間",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 217
+        }
+      },
+      {
+        "comment": "",
+        "key": "授業評価",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 256
+        }
+      },
+      {
+        "comment": "",
+        "key": "授業の評価を確認することができます",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 238
+        }
+      },
+      {
+        "comment": "",
+        "key": "チャット",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 290
+        }
+      },
+      {
+        "comment": "",
+        "key": "学科、学年、サークル別でチャットを始めましょう",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 272
+        }
+      },
+      {
+        "comment": "",
+        "key": "もっと",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 339
+        }
+      },
+      {
+        "comment": "",
+        "key": "準備中です...",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 303
+        }
+      },
+      {
+        "comment": "",
+        "key": "準備中です...",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 307
+        }
+      },
+      {
+        "comment": "",
+        "key": "準備中です...",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 311
+        }
+      },
+      {
+        "comment": "",
+        "key": "準備中です...",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 315
+        }
+      },
+      {
+        "comment": "",
+        "key": "準備中です...",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 319
+        }
+      },
+      {
+        "comment": "",
+        "key": "準備中です...",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 329
+        }
+      },
+      {
+        "comment": "",
+        "key": "準備中です...",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 333
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,18 @@
+"/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/DerivedSources/GeneratedAssetSymbols.swift":
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps"
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues"
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/GeneratedAssetSymbols.d"
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/GeneratedAssetSymbols.dia"
+"/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/DerivedSources/CoreDataGenerated/unitoku/Post+CoreDataProperties.swift":
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/Post+CoreDataProperties.o"
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/Post+CoreDataProperties.swiftconstvalues"
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/Post+CoreDataProperties.swiftdeps"
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/Post+CoreDataProperties.dia"
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/Post+CoreDataProperties.d"
+"/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/DerivedSources/CoreDataGenerated/unitoku/unitoku+CoreDataModel.swift":
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitoku+CoreDataModel.swiftdeps"
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitoku+CoreDataModel.swiftconstvalues"
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitoku+CoreDataModel.d"
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitoku+CoreDataModel.dia"
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitoku+CoreDataModel.o"

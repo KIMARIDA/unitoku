@@ -1,0 +1,40 @@
+{
+  "source": "/Users/junnykim/unitoku/unitoku/ContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "ユニトク",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 79
+        }
+      },
+      {
+        "comment": "",
+        "key": "匿名で投稿",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 25
+        }
+      },
+      {
+        "comment": "",
+        "key": "何を考えていますか？",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "投稿",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 37
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,32 @@
+{
+  "source": "/Users/junnykim/unitoku/unitoku/BoardListView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "掲示板",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 48
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld件の投稿",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "この掲示板に投稿",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 43
+        }
+      }
+    ]
+  },
+  "version": 1
+}

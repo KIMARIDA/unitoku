@@ -1,0 +1,24 @@
+"/Users/junnykim/unitoku/unitoku/LoginView.swift":
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/LoginView.dia"
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/LoginView.swiftdeps"
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/LoginView.o"
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/LoginView.d"
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/LoginView.swiftconstvalues"
+"/Users/junnykim/unitoku/unitoku/MainTabView.swift":
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/MainTabView.swiftconstvalues"
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/MainTabView.dia"
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/MainTabView.d"
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/MainTabView.o"
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/MainTabView.swiftdeps"
+"/Users/junnykim/unitoku/unitoku/unitokuApp.swift":
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitokuApp.swiftconstvalues"
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitokuApp.swiftdeps"
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitokuApp.dia"
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitokuApp.o"
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/unitokuApp.d"
+"/Users/junnykim/unitoku/unitoku/HomeView.swift":
+  swift-dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/HomeView.swiftdeps"
+  const-values: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/HomeView.swiftconstvalues"
+  diagnostics: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/HomeView.dia"
+  dependencies: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/HomeView.d"
+  object: "/Users/junnykim/unitoku/build/Build/Intermediates.noindex/unitoku.build/Debug-iphonesimulator/unitoku.build/Objects-normal/arm64/HomeView.o"

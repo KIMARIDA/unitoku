@@ -1,0 +1,152 @@
+{
+  "source": "/Users/junnykim/unitoku/unitoku/NewPostView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "新規投稿",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 220
+        }
+      },
+      {
+        "comment": "",
+        "key": "キャンセル",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 222
+        }
+      },
+      {
+        "comment": "",
+        "key": "投稿",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 225
+        }
+      },
+      {
+        "comment": "",
+        "key": "タイトル",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 71
+        }
+      },
+      {
+        "comment": "",
+        "key": "匿名",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "内容を入力してください",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 81
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld/5000",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 100
+        }
+      },
+      {
+        "comment": "",
+        "key": "ハッシュタグ (#タグ #タグ)",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 116
+        }
+      },
+      {
+        "comment": "",
+        "key": "写真を添付",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 132
+        }
+      },
+      {
+        "comment": "",
+        "key": "写真 %lld枚",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 141
+        }
+      },
+      {
+        "comment": "",
+        "key": "追加",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 151
+        }
+      },
+      {
+        "comment": "",
+        "key": "おすすめ投稿",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 195
+        }
+      },
+      {
+        "comment": "",
+        "key": "投稿する",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 207
+        }
+      },
+      {
+        "comment": "",
+        "key": "掲示板を選択",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 236
+        }
+      },
+      {
+        "comment": "",
+        "key": "キャンセル",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 258
+        }
+      },
+      {
+        "comment": "",
+        "key": "投稿完了",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 242
+        }
+      },
+      {
+        "comment": "",
+        "key": "投稿が正常に登録されました",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 243
+        }
+      },
+      {
+        "comment": "",
+        "key": "確認",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 244
+        }
+      }
+    ]
+  },
+  "version": 1
+}
