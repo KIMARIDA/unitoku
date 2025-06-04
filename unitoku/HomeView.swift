@@ -94,107 +94,132 @@ struct HomeView: View {
     
     var body: some View {
         NavigationView {
-            List {
-                VStack(alignment: .leading, spacing: 20) {
-                    // 人気の投稿セクション
-                    VStack(alignment: .leading) {
-                        HStack {
-                            AnimatedFlameView()
-                                .foregroundColor(Color(hex: "FF3B30"))
-                            Text("人気")
-                                .font(.headline)
-                                .foregroundColor(Color(hex: "FF3B30"))
-                        }
-                        .padding(.horizontal)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 15) {
-                                ForEach(hotPosts.prefix(5)) { post in
-                                    NavigationLink(destination: PostDetailView(post: post)) {
-                                        HotPostCard(post: post)
-                                    }
-                                }
-                                
-                                // 投稿がない場合のプレースホルダー表示
-                                if (hotPosts.isEmpty) {
-                                    ForEach(0..<3, id: \.self) { _ in
-                                        EmptyPostCard()
-                                    }
-                                }
+            ZStack(alignment: .top) {
+                List {
+                    VStack(alignment: .leading, spacing: 20) {
+                        // 人気の投稿セクション
+                        VStack(alignment: .leading) {
+                            HStack {
+                                AnimatedFlameView()
+                                    .foregroundColor(Color(hex: "FF3B30"))
+                                Text("人気")
+                                    .font(.headline)
+                                    .foregroundColor(Color(hex: "FF3B30"))
                             }
                             .padding(.horizontal)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 15) {
+                                    ForEach(hotPosts.prefix(5)) { post in
+                                        NavigationLink(destination: PostDetailView(post: post)) {
+                                            HotPostCard(post: post)
+                                        }
+                                    }
+                                    
+                                    // 投稿がない場合のプレースホルダー表示
+                                    if (hotPosts.isEmpty) {
+                                        ForEach(0..<3, id: \.self) { _ in
+                                            EmptyPostCard()
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
                         }
-                    }
-                    
-                    Divider()
-                        .padding(.horizontal)
-                    
-                    // 게시판 섹션 - 정렬 버튼 추가
-                    VStack(alignment: .leading) {
-                        HStack {
-                            // 정렬 버튼 (왼쪽에 위치) - 색상을 회색으로 변경
-                            Button(action: {
-                                sortOption.toggle()
-                            }) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: sortOption == .popular ? "flame.fill" : "clock.fill")
-                                        .foregroundColor(.gray)
-                                        .frame(width: 16, height: 16) // 고정 크기로 아이콘 사이즈 설정
-                                    Text(sortOption.rawValue)
+                        
+                        Divider()
+                            .padding(.horizontal)
+                        
+                        // 게시판 섹션 - 정렬 버튼 추가
+                        VStack(alignment: .leading) {
+                            HStack {
+                                // 정렬 버튼 (왼쪽에 위치) - 색상을 회색으로 변경
+                                Button(action: {
+                                    sortOption.toggle()
+                                }) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: sortOption == .popular ? "flame.fill" : "clock.fill")
+                                            .foregroundColor(.gray)
+                                            .frame(width: 16, height: 16) // 고정 크기로 아이콘 사이즈 설정
+                                        Text(sortOption.rawValue)
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(15)
+                                    .frame(height: 32) // 버튼 높이 고정
+                                }
+                                .buttonStyle(BorderlessButtonStyle()) // 정렬 버튼 탭 영역 분리
+                                
+                                Spacer()
+                            }
+                            .padding(.horizontal)
+                            .padding(.bottom, 8)
+                            
+                            // 게시판 글 목록 - 정렬된 결과 사용
+                            LazyVStack(alignment: .leading, spacing: 5) {
+                                ForEach(sortedPosts) { post in
+                                    NavigationLink(destination: PostDetailView(post: post)) {
+                                        PostRow(post: post)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    
+                                    Divider()
+                                }
+                                
+                                // 게시물이 없을 경우
+                                if sortedPosts.isEmpty {
+                                    Text("投稿がありません")
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
+                                        .padding()
+                                        .frame(maxWidth: .infinity, alignment: .center)
                                 }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(15)
-                                .frame(height: 32) // 버튼 높이 고정
                             }
-                            .buttonStyle(BorderlessButtonStyle()) // 정렬 버튼 탭 영역 분리
-                            
-                            Spacer()
+                            .padding(.horizontal, 5)
+                            .background(Color.white)
+                            .cornerRadius(10)
+                            .shadow(color: Color.black.opacity(0.05), radius: 3)
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
-                        .padding(.bottom, 8)
                         
-                        // 게시판 글 목록 - 정렬된 결과 사용
-                        LazyVStack(alignment: .leading, spacing: 5) {
-                            ForEach(sortedPosts) { post in
-                                NavigationLink(destination: PostDetailView(post: post)) {
-                                    PostRow(post: post)
+                        Spacer()
+                    }
+                    .padding(.vertical)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                }
+                .listStyle(PlainListStyle())
+                .id(refreshID) // 화면 갱신용 ID
+                // refreshable 수정자 제거하고 gesture로 대체
+                .simultaneousGesture(
+                    DragGesture()
+                        .onEnded { gesture in
+                            if gesture.translation.height > 50 && !isRefreshing {
+                                Task {
+                                    await refreshData()
                                 }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                                Divider()
-                            }
-                            
-                            // 게시물이 없을 경우
-                            if sortedPosts.isEmpty {
-                                Text("投稿がありません")
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-                                    .padding()
-                                    .frame(maxWidth: .infinity, alignment: .center)
                             }
                         }
-                        .padding(.horizontal, 5)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(color: Color.black.opacity(0.05), radius: 3)
-                        .padding(.horizontal)
+                )
+                .animation(nil, value: refreshID) // 애니메이션 비활성화
+
+                // 커스텀 리프레시 인디케이터
+                if isRefreshing {
+                    VStack {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(1.5)
+                            .padding(8)
+                            .background(Color(.systemBackground).opacity(0.8))
+                            .cornerRadius(8)
                     }
-                    
-                    Spacer()
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 20)
                 }
-                .padding(.vertical)
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
             }
-            .listStyle(PlainListStyle())
-            .refreshable {
-                await refreshData()
-            }
-            .id(refreshID) // 새로고침할 때 화면을 강제로 갱신
             .navigationTitle("立命館大学")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -287,8 +312,10 @@ struct HomeView: View {
         // CoreData 컨텍스트 새로고침
         viewContext.refreshAllObjects()
         
-        // refreshID를 업데이트하여 UI 강제 새로고침
-        refreshID = UUID()
+        // refreshID를 업데이트하여 UI 강제 새로고침 (애니메이션 없이)
+        withAnimation(nil) {
+            refreshID = UUID()
+        }
         
         print("Refresh completed")
         isRefreshing = false
@@ -315,10 +342,10 @@ struct PostRow: View {
                 .lineLimit(2)
             
             HStack {
-                // 좋아요 수 - 버튼 기능 없이 아이콘과 카운트만 표시
+                // 좋아요 수 - 사용자가 좋아요 누른 경우 채워진 아이콘 표시
                 HStack(spacing: 4) {
-                    Image(systemName: "hand.thumbsup")
-                        .foregroundColor(Color.appTheme.opacity(0.5))
+                    Image(systemName: hasLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
+                        .foregroundColor(hasLiked ? Color.appTheme : Color.appTheme.opacity(0.5))
                         .imageScale(.small)
                     Text("\(post.likeCount)")
                         .font(.caption)
@@ -349,8 +376,21 @@ struct PostRow: View {
         .padding(.horizontal)
         .onAppear {
             // 게시물이 화면에 나타날 때 사용자 상호작용 확인
+            checkIfUserLikedPost()
             checkIfUserCommentedPost()
+            print("PostRow appeared for post: \(post.title ?? "unknown"), hasLiked: \(hasLiked)")
         }
+    }
+    
+    // 사용자가 해당 게시물에 좋아요를 눌렀는지 확인하는 함수
+    private func checkIfUserLikedPost() {
+        guard let postID = post.id?.uuidString else {
+            print("Post ID is nil in PostRow")
+            return
+        }
+        let likeKey = "liked_\(postID)"
+        hasLiked = UserDefaults.standard.bool(forKey: likeKey)
+        print("PostRow: Checking like status for \(postID): \(hasLiked)")
     }
     
     // 사용자가 해당 게시물에 댓글을 달았는지 확인하는 함수
@@ -402,10 +442,10 @@ struct HotPostCard: View {
             
             // 좋아요 및 댓글 수만 표시 (버튼 기능 제거)
             HStack {
-                // 좋아요 표시 - 버튼 기능 없이 아이콘과 카운트만 표시
+                // 좋아요 표시 - 사용자가 좋아요 누른 경우 채워진 아이콘 표시
                 HStack(spacing: 4) {
-                    Image(systemName: "hand.thumbsup")
-                        .foregroundColor(Color.appTheme.opacity(0.5))
+                    Image(systemName: hasLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
+                        .foregroundColor(hasLiked ? Color.appTheme : Color.appTheme.opacity(0.5))
                     Text("\(post.likeCount)")
                         .font(.caption)
                         .fontWeight(.bold)
@@ -431,9 +471,50 @@ struct HotPostCard: View {
         .background(Color(.systemGray6))
         .cornerRadius(10)
         .onAppear {
-            // 게시물이 화면에 나타날 때 사용자가 댓글을 달았는지 확인
+            // 게시물이 화면에 나타날 때 사용자 상호작용 확인
+            checkIfUserLikedPost()
             checkIfUserCommentedPost()
+            
+            // 좋아요 상태 변경 알림 구독
+            setupNotifications()
         }
+        .onDisappear {
+            // 알림 구독 취소
+            NotificationCenter.default.removeObserver(self)
+        }
+    }
+    
+    // 알림 수신을 위한 설정
+    private func setupNotifications() {
+        guard let postID = post.id?.uuidString else { return }
+        
+        // 기존 옵저버 제거하여 중복 등록 방지
+        NotificationCenter.default.removeObserver(self)
+        
+        NotificationCenter.default.addObserver(
+            forName: .postLikeStatusChanged,
+            object: nil,
+            queue: .main
+        ) { notification in
+            guard let userInfo = notification.userInfo,
+                  let notificationPostID = userInfo["postID"] as? String,
+                  notificationPostID == postID,
+                  let newLikeStatus = userInfo["hasLiked"] as? Bool else {
+                return
+            }
+            
+            // 좋아요 상태 업데이트
+            self.hasLiked = newLikeStatus
+            print("HotPostCard: Updated like status for \(postID): \(newLikeStatus)")
+        }
+    }
+    
+    // 사용자가 해당 게시물에 좋아요를 눌렀는지 확인하는 함수
+    private func checkIfUserLikedPost() {
+        guard let postID = post.id?.uuidString else { return }
+        let likeKey = "liked_\(postID)"
+        hasLiked = UserDefaults.standard.bool(forKey: likeKey)
+        print("HotPostCard: Checking like status for \(postID): \(hasLiked)")
     }
     
     // 사용자가 해당 게시물에 댓글을 달았는지 확인하는 함수

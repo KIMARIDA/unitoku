@@ -276,7 +276,14 @@ struct PostDetailView: View {
     }
     
     private func likePost() {
+        guard let postID = post.id?.uuidString else { return }
+        
         hasLiked.toggle()
+        
+        // UserDefaults에 좋아요 상태 저장
+        let likeKey = "liked_\(postID)"
+        UserDefaults.standard.set(hasLiked, forKey: likeKey)
+        
         if hasLiked {
             likeCount += 1
             
@@ -290,6 +297,13 @@ struct PostDetailView: View {
             post.likeCount -= 1
             try? viewContext.save()
         }
+        
+        // NotificationCenter를 통해 좋아요 상태 변경 알림
+        NotificationCenter.default.post(
+            name: .postLikeStatusChanged,
+            object: nil,
+            userInfo: ["postID": postID, "hasLiked": hasLiked]
+        )
     }
     
     // dislikePost 함수 제거
