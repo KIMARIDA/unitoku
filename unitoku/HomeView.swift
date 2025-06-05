@@ -40,6 +40,8 @@ struct HomeView: View {
     @State private var sortOption: SortOption = .popular // Default to popular sort
     @State private var isRefreshing = false // 새로고침 상태 추적
     @State private var refreshID = UUID() // 화면 강제 새로고침용 ID
+    @State private var isShowingNotifications = false // 알림 보기 상태
+    @State private var hasUnreadNotifications = false // 미읽은 알림 여부
     
     // 인기 게시물 FetchRequest
     @FetchRequest(
@@ -98,7 +100,7 @@ struct HomeView: View {
             ZStack(alignment: .top) {
                 List {
                     VStack(alignment: .leading, spacing: 20) {
-                        // 人気の投稿セクション
+                        // 인기 게시물 섹션
                         VStack(alignment: .leading) {
                             HStack {
                                 AnimatedFlameView()
@@ -251,13 +253,15 @@ struct HomeView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 16) {
-                        // 알림 버튼 추가 - 테두리만 핑크색
+                        // 알림 버튼 - 미읽은 알림이 있는 경우 뱃지 표시
                         Button {
-                            // 알림 기능은 나중에 구현
+                            isShowingNotifications = true
                         } label: {
-                            Image(systemName: "bell")
-                                .foregroundColor(Color(hex: "fd72ae"))
-                                .imageScale(.large)
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: hasUnreadNotifications ? "bell.badge" : "bell")
+                                    .foregroundColor(Color(hex: "fd72ae"))
+                                    .imageScale(.large)
+                            }
                         }
                         
                         // 항상 활성화된 글쓰기 버튼
@@ -284,6 +288,13 @@ struct HomeView: View {
                         .environment(\.managedObjectContext, viewContext)
                 }
             }
+            .sheet(isPresented: $isShowingNotifications) {
+                NotificationView()
+                    .environment(\.managedObjectContext, viewContext)
+                    .onDisappear {
+                        checkUnreadNotificationsStatus()
+                    }
+            }
             .alert(isPresented: $showingAlert) {
                 Alert(
                     title: Text("エラー"),
@@ -296,6 +307,9 @@ struct HomeView: View {
                 if categories.isEmpty {
                     _ = createDefaultCategory()
                 }
+                
+                // 미읽은 알림 상태 확인
+                checkUnreadNotificationsStatus()
             }
         }
     }
@@ -346,6 +360,14 @@ struct HomeView: View {
         
         print("Refresh completed")
         isRefreshing = false
+    }
+    
+    // 미읽은 알림 상태 확인 함수
+    private func checkUnreadNotificationsStatus() {
+        // 여기서는 간단히 UserDefaults를 사용하여 미읽은 알림 상태를 확인
+        // 실제 앱에서는 서버나 데이터베이스와 연동하여 확인해야 함
+        hasUnreadNotifications = UserDefaults.standard.bool(forKey: "hasUnreadNotifications")
+        print("미읽은 알림 상태 확인: \(hasUnreadNotifications)")
     }
 }
 
