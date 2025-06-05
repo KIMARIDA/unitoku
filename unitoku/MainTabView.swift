@@ -279,7 +279,9 @@ struct TimeTableView: View {
     // 授業があるセルの内容
     private func courseCellContent(course: Course) -> some View {
         Button(action: {
-            showingCourseDetail = course
+            // 詳細画面をスキップして直接編集画面を表示
+            newCourse = course
+            showingNewCourseSheet = true
         }) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(course.name)
@@ -305,12 +307,7 @@ struct TimeTableView: View {
         .contentShape(Rectangle())
         .contextMenu {
             Button(action: {
-                showingCourseDetail = course
-            }) {
-                Label("詳細", systemImage: "info.circle")
-            }
-            
-            Button(action: {
+                // 詳細画面をスキップして直接編集画面を表示
                 newCourse = course
                 showingNewCourseSheet = true
             }) {
