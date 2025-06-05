@@ -81,9 +81,14 @@ struct MainTabView: View {
 
 // 時間割ビュー
 struct TimeTableView: View {
-    @State private var courses = Course.samples
+    @StateObject private var viewModel = TimeTableViewModel()
     @State private var showingCourseDetail: Course? = nil
     @State private var showingNewCourseSheet = false
+    @State private var editMode = false
+    @State private var newCourse = Course(name: "", professor: "", room: "", weekday: .monday, period: .first, color: .blue)
+    
+    let weekdays = Weekday.allCases
+    let periods = Period.allCases
     
     var body: some View {
         NavigationView {
@@ -92,40 +97,50 @@ struct TimeTableView: View {
                 ScrollView {
                     timeTableContent
                 }
-                .navigationTitle("時間割") // 대학교 이름과 시간표 함께 표시
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        addButton
+                
+                // コース一覧ボタン
+                courseListButton
+            }
+            .navigationTitle("時間割")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    addButton
+                }
+                
+                ToolbarItem(placement: .navigationBarLeading) {
+                    editButton
+                }
+            }
+            .sheet(isPresented: $showingNewCourseSheet) {
+                CourseFormView(course: $newCourse, viewModel: viewModel, isEditing: false) { success in
+                    if success {
+                        showingNewCourseSheet = false
                     }
                 }
-                .sheet(item: $showingCourseDetail) { course in
-                    CourseDetailView(course: course)
-                }
-                .sheet(isPresented: $showingNewCourseSheet) {
-                    Text("新しい授業を登録")
-                        .font(.headline)
-                        .padding()
-                }
+            }
+            .sheet(item: $showingCourseDetail) { course in
+                CourseDetailView(course: course, viewModel: viewModel)
             }
         }
     }
     
     // 時間割コンテンツ
     private var timeTableContent: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 1) {
             // ヘッダー行（曜日）
             weekdayHeaderRow
             
             // 各時限行
-            ForEach(Period.allCases) { period in
+            ForEach(periods) { period in
                 periodRow(period: period)
             }
         }
+        .padding(.bottom, 20)
     }
     
     // 曜日ヘッダー行
     private var weekdayHeaderRow: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 1) {
             // 時限列
             Text("時限")
                 .font(.caption)
@@ -133,10 +148,15 @@ struct TimeTableView: View {
                 .background(Color(UIColor.systemBackground))
             
             // 曜日列
-            ForEach(Weekday.allCases) { weekday in
+            ForEach(weekdays) { weekday in
                 Text(weekday.rawValue)
                     .font(.headline)
-                    .background(Color(UIColor.systemBackground))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 0)
+                            .fill(Color.blue.opacity(0.1))
+                    )
             }
         }
         .background(Color(.systemGray5))
@@ -145,12 +165,12 @@ struct TimeTableView: View {
     // 時限の行
     private func periodRow(period: Period) -> some View {
         VStack(spacing: 0) {
-            HStack(spacing: 0) {
+            HStack(spacing: 1) {
                 // 時限表示
                 periodCell(period: period)
                 
                 // 各曜日のセル
-                ForEach(Weekday.allCases) { weekday in
+                ForEach(weekdays) { weekday in
                     courseCell(for: weekday, at: period)
                 }
             }
@@ -163,9 +183,9 @@ struct TimeTableView: View {
     private func periodCell(period: Period) -> some View {
         VStack {
             Text("\(period.rawValue)")
-                .font(.caption)
+                .font(.headline)
             Text(period.timeRange)
-                .font(.system(size: 8))
+                .font(.caption)
                 .foregroundColor(.secondary)
         }
         .frame(width: 40, height: 80)
@@ -175,22 +195,85 @@ struct TimeTableView: View {
     // 追加ボタン
     private var addButton: some View {
         Button(action: {
+            newCourse = Course(
+                name: "",
+                professor: "",
+                room: "",
+                weekday: .monday,
+                period: .first,
+                color: viewModel.randomColor()
+            )
             showingNewCourseSheet = true
         }) {
             Image(systemName: "plus")
         }
     }
     
+    // 編集ボタン
+    private var editButton: some View {
+        Button(action: {
+            editMode.toggle()
+        }) {
+            Text(editMode ? "完了" : "編集")
+        }
+    }
+    
+    // コース一覧ボタン
+    private var courseListButton: some View {
+        Button(action: {
+            // View all courses in a list
+        }) {
+            HStack {
+                Image(systemName: "list.bullet")
+                Text("授業一覧を表示")
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color.blue)
+            .cornerRadius(10)
+            .padding()
+        }
+    }
+    
     // 特定の曜日・時限のセルを生成
     @ViewBuilder
     private func courseCell(for weekday: Weekday, at period: Period) -> some View {
-        let coursesForCell = courses.filter { $0.weekday == weekday && $0.period == period }
+        let course = viewModel.courseFor(weekday: weekday, period: period)
         
-        if let course = coursesForCell.first {
+        if let course = course {
+            // 授業があるセルの内容
             courseCellContent(course: course)
+        } else if editMode {
+            // 編集モードで授業がない場合は追加ボタン
+            Button(action: {
+                newCourse = Course(
+                    name: "",
+                    professor: "",
+                    room: "",
+                    weekday: weekday,
+                    period: period,
+                    color: viewModel.randomColor()
+                )
+                showingNewCourseSheet = true
+            }) {
+                Image(systemName: "plus")
+                    .foregroundColor(.gray)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .background(Color.gray.opacity(0.1))
         } else {
-            emptyCourseCell()
+            // 授業がなくて編集モードでもない場合は空セル
+            emptyCell()
         }
+    }
+    
+    // 空のセル
+    private func emptyCell() -> some View {
+        Rectangle()
+            .fill(Color.clear)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .aspectRatio(1.0, contentMode: .fill)
     }
     
     // 授業があるセルの内容
@@ -200,211 +283,319 @@ struct TimeTableView: View {
         }) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(course.name)
-                    .font(.caption)
-                    .lineLimit(2)
+                    .font(.system(size: 12, weight: .bold))
+                    .lineLimit(1)
                     .foregroundColor(.white)
                 
                 Text(course.room)
-                    .font(.system(size: 9))
-                    .foregroundColor(.white.opacity(0.8))
+                    .font(.system(size: 10))
                     .lineLimit(1)
+                    .foregroundColor(.white)
+                
+                Text(course.professor)
+                    .font(.system(size: 10))
+                    .lineLimit(1)
+                    .foregroundColor(.white)
             }
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 80)
             .padding(4)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .background(course.color)
         }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
-    // 空のセル
-    private func emptyCourseCell() -> some View {
-        Rectangle()
-            .fill(Color.clear)
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 80)
-            .background(Color(UIColor.systemBackground))
-            .onTapGesture {
-                // 空きセルをタップ時の処理も可能
+        .contextMenu {
+            Button(action: {
+                showingCourseDetail = course
+            }) {
+                Label("詳細", systemImage: "info.circle")
             }
+            
+            Button(action: {
+                newCourse = course
+                showingNewCourseSheet = true
+            }) {
+                Label("編集", systemImage: "pencil")
+            }
+            
+            Button(role: .destructive, action: {
+                viewModel.deleteCourse(course)
+            }) {
+                Label("削除", systemImage: "trash")
+            }
+        }
     }
 }
 
-// 授業詳細ビュー
+// 授業詳細画面
 struct CourseDetailView: View {
     let course: Course
+    let viewModel: TimeTableViewModel
+    @Environment(\.presentationMode) var presentationMode
+    @State private var showingEditSheet = false
+    @State private var editingCourse: Course
+    
+    init(course: Course, viewModel: TimeTableViewModel) {
+        self.course = course
+        self.viewModel = viewModel
+        self._editingCourse = State(initialValue: course)
+    }
     
     var body: some View {
         NavigationView {
-            Form {
+            List {
                 Section(header: Text("授業情報")) {
                     HStack {
                         Text("授業名")
                         Spacer()
                         Text(course.name)
+                            .foregroundColor(.gray)
                     }
                     
                     HStack {
                         Text("教授")
                         Spacer()
                         Text(course.professor)
+                            .foregroundColor(.gray)
                     }
                     
                     HStack {
                         Text("教室")
                         Spacer()
                         Text(course.room)
+                            .foregroundColor(.gray)
+                    }
+                }
+                
+                Section(header: Text("時間")) {
+                    HStack {
+                        Text("曜日")
+                        Spacer()
+                        Text(course.weekday.rawValue + "曜日")
+                            .foregroundColor(.gray)
                     }
                     
                     HStack {
-                        Text("曜日・時限")
+                        Text("時限")
                         Spacer()
-                        Text("\(course.weekday.rawValue)曜 \(course.period.rawValue)限")
-                    }
-                    
-                    HStack {
-                        Text("時間")
-                        Spacer()
-                        Text(course.period.timeRange)
-                    }
-                }
-            }
-            .navigationTitle("授業詳細")
-            .navigationBarTitleDisplayMode(.inline)
-        }
-    }
-}
-
-// 授業評価ビュー
-struct CourseReviewView: View {
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                Image(systemName: "star")
-                    .font(.system(size: 60))
-                    .foregroundColor(Color.appTheme)
-                
-                Text("授業の評価を確認することができます")
-                    .font(.headline)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                
-                VStack(alignment: .leading, spacing: 10) {
-                    FeatureRow(icon: "magnifyingglass", text: "授業の検索と評価確認")
-                    FeatureRow(icon: "pencil.and.outline", text: "レビューを書く")
-                    FeatureRow(icon: "chart.bar", text: "授業別の評価と統計")
-                    FeatureRow(icon: "doc.text", text: "試験情報と課題量の確認")
-                }
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color.white))
-                .shadow(color: Color.black.opacity(0.1), radius: 5)
-                .padding(.horizontal)
-                
-                Spacer()
-            }
-            .navigationTitle("授業評価")
-            .padding(.top)
-            .background(Color(.systemGray6).ignoresSafeArea())
-        }
-    }
-}
-
-// チャットビュー
-struct ChatView: View {
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                Image(systemName: "message")
-                    .font(.system(size: 60))
-                    .foregroundColor(Color.appTheme)
-                
-                Text("学科、学年、サークル別でチャットを始めましょう")
-                    .font(.headline)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                
-                VStack(alignment: .leading, spacing: 10) {
-                    FeatureRow(icon: "person.3", text: "グループチャットルーム作成")
-                    FeatureRow(icon: "person", text: "1:1メッセージを送る")
-                    FeatureRow(icon: "building.2", text: "学科別チャットルーム")
-                    FeatureRow(icon: "heart.circle", text: "趣味別チャットグループ")
-                }
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color.white))
-                .shadow(color: Color.black.opacity(0.1), radius: 5)
-                .padding(.horizontal)
-                
-                Spacer()
-            }
-            .navigationTitle("チャット")
-            .padding(.top)
-            .background(Color(.systemGray6).ignoresSafeArea())
-        }
-    }
-}
-
-// もっとビュー
-struct MoreView: View {
-    var body: some View {
-        NavigationView {
-            List {
-                Section {
-                    NavigationLink(destination: Text("準備中です...").foregroundColor(Color.appTheme)) {
-                        FeatureRow(icon: "fork.knife", text: "学食情報")
-                    }
-                    
-                    NavigationLink(destination: Text("準備中です...").foregroundColor(Color.appTheme)) {
-                        FeatureRow(icon: "bus", text: "シャトルバス時間表")
-                    }
-                    
-                    NavigationLink(destination: Text("準備中です...").foregroundColor(Color.appTheme)) {
-                        FeatureRow(icon: "books.vertical", text: "図書館の座席状況")
-                    }
-                    
-                    NavigationLink(destination: Text("準備中です...").foregroundColor(Color.appTheme)) {
-                        FeatureRow(icon: "cart", text: "フリーマーケット掲示板")
-                    }
-                    
-                    NavigationLink(destination: Text("準備中です...").foregroundColor(Color.appTheme)) {
-                        FeatureRow(icon: "newspaper", text: "課外活動情報")
-                    }
-                }
-                
-                Section {
-                    NavigationLink(destination: ProfileView()) {
-                        FeatureRow(icon: "person.circle", text: "プロフィール設定")
-                    }
-                    
-                    NavigationLink(destination: Text("準備中です...").foregroundColor(Color.appTheme)) {
-                        FeatureRow(icon: "gear", text: "アプリ設定")
-                    }
-                    
-                    NavigationLink(destination: Text("準備中です...").foregroundColor(Color.appTheme)) {
-                        FeatureRow(icon: "questionmark.circle", text: "お問い合わせ")
+                        Text("\(course.period.rawValue)限 (\(course.period.timeRange))")
+                            .foregroundColor(.gray)
                     }
                 }
             }
             .listStyle(InsetGroupedListStyle())
-            .navigationTitle("もっと")
+            .navigationTitle(course.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showingEditSheet = true
+                    }) {
+                        Text("編集")
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text("閉じる")
+                    }
+                }
+            }
+            .sheet(isPresented: $showingEditSheet) {
+                CourseFormView(course: $editingCourse, viewModel: viewModel, isEditing: true) { success in
+                    if success {
+                        viewModel.updateCourse(editingCourse)
+                        showingEditSheet = false
+                    }
+                }
+            }
         }
     }
 }
 
-// 기능 행 컴포넌트
-struct FeatureRow: View {
-    var icon: String
-    var text: String
+// 授業作成・編集フォーム
+struct CourseFormView: View {
+    @Environment(\.presentationMode) var presentationMode
+    @Binding var course: Course
+    let viewModel: TimeTableViewModel
+    let isEditing: Bool
+    let onSave: (Bool) -> Void
+    
+    @State private var name: String = ""
+    @State private var professor: String = ""
+    @State private var room: String = ""
+    @State private var weekday: Weekday = .monday
+    @State private var period: Period = .first
+    @State private var color: Color = .blue
+    
+    init(course: Binding<Course>, viewModel: TimeTableViewModel, isEditing: Bool, onSave: @escaping (Bool) -> Void = {_ in}) {
+        self._course = course
+        self.viewModel = viewModel
+        self.isEditing = isEditing
+        self.onSave = onSave
+        
+        _name = State(initialValue: course.wrappedValue.name)
+        _professor = State(initialValue: course.wrappedValue.professor)
+        _room = State(initialValue: course.wrappedValue.room)
+        _weekday = State(initialValue: course.wrappedValue.weekday)
+        _period = State(initialValue: course.wrappedValue.period)
+        _color = State(initialValue: course.wrappedValue.color)
+    }
     
     var body: some View {
-        HStack(spacing: 15) {
-            Image(systemName: icon)
-                .foregroundColor(Color.appTheme)
-                .frame(width: 25)
-            
-            Text(text)
-                .font(.body)
-            
-            Spacer()
+        NavigationView {
+            Form {
+                Section(header: Text("授業情報")) {
+                    TextField("授業名", text: $name)
+                    TextField("教授名", text: $professor)
+                    TextField("教室", text: $room)
+                }
+                
+                Section(header: Text("時間")) {
+                    Picker("曜日", selection: $weekday) {
+                        ForEach(Weekday.allCases) { day in
+                            Text(day.rawValue + "曜日").tag(day)
+                        }
+                    }
+                    
+                    Picker("時限", selection: $period) {
+                        ForEach(Period.allCases) { period in
+                            Text("\(period.rawValue)限 (\(period.timeRange))").tag(period)
+                        }
+                    }
+                }
+                
+                Section(header: Text("色")) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 10) {
+                        ForEach(Course.colors, id: \.self) { colorOption in
+                            ZStack {
+                                Circle()
+                                    .fill(colorOption)
+                                    .frame(width: 30, height: 30)
+                                
+                                if colorOption == color {
+                                    Circle()
+                                        .strokeBorder(Color.white, lineWidth: 2)
+                                        .frame(width: 30, height: 30)
+                                    
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .onTapGesture {
+                                color = colorOption
+                            }
+                            .padding(5)
+                        }
+                    }
+                }
+                
+                if isEditing {
+                    Section {
+                        Button(action: {
+                            viewModel.deleteCourse(course)
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
+                            HStack {
+                                Spacer()
+                                Text("授業を削除")
+                                    .foregroundColor(.red)
+                                Spacer()
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle(isEditing ? "授業を編集" : "新しい授業")
+            .navigationBarItems(
+                leading: Button("キャンセル") {
+                    presentationMode.wrappedValue.dismiss()
+                },
+                trailing: Button("保存") {
+                    saveCourse()
+                }
+                .disabled(name.isEmpty)
+            )
         }
-        .padding(.vertical, 5)
+    }
+    
+    private func saveCourse() {
+        course.name = name
+        course.professor = professor
+        course.room = room
+        course.weekday = weekday
+        course.period = period
+        course.color = color
+        
+        if !isEditing {
+            viewModel.addCourse(course)
+        }
+        
+        onSave(true)
+        presentationMode.wrappedValue.dismiss()
+    }
+}
+
+// 時間割データを管理するViewModel
+class TimeTableViewModel: ObservableObject {
+    @Published var courses: [Course] = Course.samples
+    
+    // 特定の曜日のコースを取得
+    func coursesFor(weekday: Weekday) -> [Course] {
+        return courses.filter { $0.weekday == weekday }
+    }
+    
+    // 特定の曜日と時間帯のコースを取得
+    func courseFor(weekday: Weekday, period: Period) -> Course? {
+        return courses.first { $0.weekday == weekday && $0.period == period }
+    }
+    
+    // コースの追加
+    func addCourse(_ course: Course) {
+        courses.append(course)
+    }
+    
+    // コースの削除
+    func deleteCourse(_ course: Course) {
+        if let index = courses.firstIndex(where: { $0.id == course.id }) {
+            courses.remove(at: index)
+        }
+    }
+    
+    // コースの更新
+    func updateCourse(_ course: Course) {
+        if let index = courses.firstIndex(where: { $0.id == course.id }) {
+            courses[index] = course
+        }
+    }
+    
+    // ランダムな色を生成
+    func randomColor() -> Color {
+        Course.colors.randomElement() ?? .blue
+    }
+}
+
+// プレースホルダービュー
+struct CourseReviewView: View {
+    var body: some View {
+        Text("授業評価画面")
+            .font(.largeTitle)
+            .foregroundColor(.gray)
+    }
+}
+
+struct ChatView: View {
+    var body: some View {
+        Text("チャット画面")
+            .font(.largeTitle)
+            .foregroundColor(.gray)
+    }
+}
+
+struct MoreView: View {
+    var body: some View {
+        Text("その他の設定")
+            .font(.largeTitle)
+            .foregroundColor(.gray)
     }
 }
 
