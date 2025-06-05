@@ -1,4 +1,4 @@
-		import SwiftUI
+import SwiftUI
 import CoreData
 
 struct PostDetailView: View {
@@ -559,26 +559,46 @@ struct CommentView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(comment.content ?? "")
-                .font(.body)
-            
-            HStack {
-                Text((comment.timestamp ?? Date()).relativeTimeInJapanese())
-                    .font(.caption)
-                    .foregroundColor(.gray)
+            // 익명 프로필과 좋아요 버튼을 같은 라인에 배치
+            HStack(spacing: 10) {
+                // 익명 프로필 아이콘
+                Image(systemName: "person.crop.circle.fill")
+                    .resizable()
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(Color.gray.opacity(0.7))
+                    .background(Color.white)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                
+                // 익명 사용자 이름
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("匿名")
+                        .font(.subheadline)
+                        .foregroundColor(.primary)
+                    
+                    Text((comment.timestamp ?? Date()).relativeTimeInJapanese())
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
                 
                 Spacer()
                 
+                // 좋아요 버튼 - 우측 상단에 위치
                 Button(action: likeComment) {
                     HStack(spacing: 4) {
                         Image(systemName: hasLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
                             .foregroundColor(hasLiked ? Color.appTheme : Color.gray)
+                            .imageScale(.medium) // 아이콘 크기 키우기
                         Text("\(likeCount)")
+                            .font(.system(size: 14, weight: .semibold)) // 폰트 사이즈와 두께 조정
                             .foregroundColor(hasLiked ? Color.appTheme : Color.gray)
                     }
-                    .font(.caption)
                 }
             }
+            
+            // 댓글 내용 - 좌측 패딩 제거하여 최좌측에서 시작하도록 함
+            Text(comment.content ?? "")
+                .font(.body)
         }
         .padding()
         .background(Color.white)
