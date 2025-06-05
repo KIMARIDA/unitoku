@@ -152,10 +152,6 @@ struct PostDetailView: View {
                             .padding(.horizontal)
                         
                         Text(post?.content ?? "")
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            .shadow(color: Color.black.opacity(0.05), radius: 3)
                             .padding(.horizontal)
                         
                         // 이미지 갤러리 추가 - 첨부화상 글귀 제거
