@@ -51,6 +51,7 @@ struct HomeView: View {
         animation: .default)
     private var hotPosts: FetchedResults<Post>
     
+    
     // 카테고리 FetchRequest
     @FetchRequest(
         entity: Category.entity(),
@@ -64,7 +65,7 @@ struct HomeView: View {
     @FetchRequest(
         entity: Post.entity(),
         sortDescriptors: [
-            NSSortDescriptor(keyPath: \Post.timestamp, ascending: false)
+            NSSortDescriptor(keyPath: \Post.timestamp , ascending: false)
         ],
         predicate: NSPredicate(format: "category.name == %@", "一般"),
         animation: .default)
@@ -107,7 +108,7 @@ struct HomeView: View {
                                     .foregroundColor(Color(hex: "FF3B30"))
                             }
                             .padding(.horizontal)
-                            
+                        
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 15) {
                                     ForEach(hotPosts.prefix(5)) { post in
@@ -392,7 +393,7 @@ struct PostRow: View {
                 Spacer()
                 
                 // 날짜
-                Text(post.timestamp ?? Date(), style: .date)
+                Text((post.timestamp ?? Date()).relativeTimeInJapanese())
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -491,6 +492,11 @@ struct HotPostCard: View {
                 }
                 
                 Spacer()
+                
+                // 상대적 시간 표시 추가
+                Text((post.timestamp ?? Date()).relativeTimeInJapanese())
+                    .font(.caption)
+                    .foregroundColor(.gray)
             }
             .padding(.top, 5)
         }

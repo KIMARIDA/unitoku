@@ -1,4 +1,4 @@
-import SwiftUI
+		import SwiftUI
 import CoreData
 
 struct PostDetailView: View {
@@ -376,6 +376,22 @@ struct PostDetailView: View {
             post.likeCount -= 1
             try? viewContext.save()
         }
+        
+        // 좋아요 상태를 UserDefaults에 저장하고 알림 전송
+        if let postID = post.id?.uuidString {
+            let likeKey = "liked_\(postID)"
+            UserDefaults.standard.set(hasLiked, forKey: likeKey)
+            
+            // 홈화면의 아이콘 상태 업데이트를 위해 알림 전송
+            NotificationCenter.default.post(
+                name: .postLikeStatusChanged,
+                object: nil,
+                userInfo: ["postID": postID, "hasLiked": hasLiked]
+            )
+        }
+        
+        // 백그라운드에서 라이크 카운트 업데이트
+        updateLikeCount(increment: hasLiked)
     }
     
     // dislikePost 함수 제거
@@ -547,7 +563,7 @@ struct CommentView: View {
                 .font(.body)
             
             HStack {
-                Text(comment.timestamp ?? Date(), formatter: commentFormatter)
+                Text((comment.timestamp ?? Date()).relativeTimeInJapanese())
                     .font(.caption)
                     .foregroundColor(.gray)
                 
