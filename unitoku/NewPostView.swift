@@ -20,6 +20,7 @@ struct NewPostView: View {
     @State private var hashtags = ""
     @State private var isHot = false
     @State private var characterCount = 0
+    @State private var showCharLimitWarning = false
     
     // 제목 글자 수 제한 상수 추가
     private let maxTitleLengthNonEnglish = 20
@@ -125,18 +126,43 @@ struct NewPostView: View {
                             .padding(.horizontal, 8)
                             .frame(minHeight: 200)
                             .onChange(of: content) { oldValue, newValue in
-                                characterCount = newValue.count
+                                // 600文字を超えたら入力を制限
+                                if newValue.count > 600 {
+                                    content = oldValue
+                                    showCharLimitWarning = true
+                                    
+                                    // 2秒後に警告メッセージを非表示
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                        showCharLimitWarning = false
+                                    }
+                                } else {
+                                    characterCount = newValue.count
+                                }
                             }
                             .opacity(content.isEmpty ? 0.25 : 1)
                     }
                     .background(colorScheme == .dark ? Color(UIColor.secondarySystemBackground) : Color.white)
+                    .overlay(
+                        Group {
+                            if showCharLimitWarning {
+                                Text("600文字の制限を超えました")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .background(Color.red.opacity(0.8))
+                                    .cornerRadius(8)
+                                    .transition(.opacity)
+                                    .padding(10)
+                            }
+                        }
+                    )
                     
                     // 文字数カウンター
                     HStack {
                         Spacer()
-                        Text("\(characterCount)/5000")
+                        Text("\(characterCount)/600")
                             .font(.caption)
-                            .foregroundColor(.gray)
+                            .foregroundColor(characterCount == 600 ? .red : .gray)
                             .padding(.trailing)
                     }
                     .padding(.vertical, 4)
