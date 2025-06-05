@@ -15,14 +15,14 @@ struct CourseEvaluationView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("수강 강의 평가")
+                    Text("受講授業評価")
                         .font(.title2)
                         .fontWeight(.bold)
                         .padding(.horizontal)
                     
-                    // 최근 평가된 강의
+                    // 最近評価された授業
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("최근 평가")
+                        Text("最近の評価")
                             .font(.headline)
                             .padding(.horizontal)
                         
@@ -44,9 +44,9 @@ struct CourseEvaluationView: View {
                     Divider()
                         .padding(.vertical, 8)
                     
-                    // 모든 강의 목록
+                    // すべての授業リスト
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("전체 강의")
+                        Text("全ての授業")
                             .font(.headline)
                             .padding(.horizontal)
                         
@@ -65,7 +65,7 @@ struct CourseEvaluationView: View {
                 }
                 .padding(.vertical)
             }
-            .navigationTitle("강의평가")
+            .navigationTitle("授業評価")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
@@ -85,7 +85,7 @@ struct CourseEvaluationView: View {
     }
 }
 
-// 최근 평가된 강의 카드
+// 最近評価された授業カード
 struct RecentCourseCard: View {
     let course: Course
     let viewModel: CourseEvaluationViewModel
@@ -118,14 +118,14 @@ struct RecentCourseCard: View {
                         .font(.caption)
                         .foregroundColor(.white)
                 } else {
-                    Text("평가 없음")
+                    Text("評価なし")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.8))
                 }
                 
                 Spacer()
                 
-                Text("\(viewModel.evaluationsForCourse(course.id).count)개 평가")
+                Text("\(viewModel.evaluationsForCourse(course.id).count)件の評価")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.8))
             }
@@ -138,7 +138,7 @@ struct RecentCourseCard: View {
     }
 }
 
-// 모든 강의 카드
+// すべての授業カード
 struct CourseCard: View {
     let course: Course
     let viewModel: CourseEvaluationViewModel
@@ -173,7 +173,7 @@ struct CourseCard: View {
                     Text(String(format: "%.1f", rating))
                         .font(.caption)
                 } else {
-                    Text("평가 없음")
+                    Text("評価なし")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
@@ -195,7 +195,7 @@ struct CourseCard: View {
     }
 }
 
-// 강의 평가 상세 화면
+// 授業評価詳細画面
 struct CourseEvaluationDetailView: View {
     let course: Course
     let viewModel: CourseEvaluationViewModel
@@ -206,7 +206,7 @@ struct CourseEvaluationDetailView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // 강의 정보 헤더
+                    // 授業情報ヘッダー
                     VStack(alignment: .leading, spacing: 8) {
                         Text(course.name)
                             .font(.title)
@@ -216,13 +216,13 @@ struct CourseEvaluationDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         
-                        Text("\(course.weekday.rawValue)요일 \(course.period.timeRange)")
+                        Text("\(course.weekday.rawValue)曜日 \(course.period.timeRange)")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         
                         Divider()
                         
-                        // 평균 평점
+                        // 平均評価
                         if let rating = course.averageRating(viewModel: viewModel) {
                             HStack(spacing: 8) {
                                 Text(String(format: "%.1f", rating))
@@ -236,12 +236,12 @@ struct CourseEvaluationDetailView: View {
                                 
                                 Spacer()
                                 
-                                Text("\(viewModel.evaluationsForCourse(course.id).count)개 평가")
+                                Text("\(viewModel.evaluationsForCourse(course.id).count)件の評価")
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
                             }
                             
-                            // 세부 항목 평점
+                            // 詳細項目の評価
                             VStack(alignment: .leading, spacing: 12) {
                                 ScoreBarView(category: .overall, score: averageScore(for: \.overallScore))
                                 ScoreBarView(category: .difficulty, score: averageScore(for: \.difficultyScore))
@@ -251,7 +251,7 @@ struct CourseEvaluationDetailView: View {
                             }
                             .padding(.vertical, 8)
                         } else {
-                            Text("아직 평가가 없습니다")
+                            Text("まだ評価がありません")
                                 .font(.headline)
                                 .foregroundColor(.gray)
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -262,10 +262,10 @@ struct CourseEvaluationDetailView: View {
                     }
                     .padding()
                     
-                    // 평가 목록
+                    // 評価リスト
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
-                            Text("강의평")
+                            Text("授業評価")
                                 .font(.headline)
                             
                             Spacer()
@@ -273,14 +273,14 @@ struct CourseEvaluationDetailView: View {
                             Button(action: {
                                 showingAddEvaluation = true
                             }) {
-                                Label("평가 작성", systemImage: "square.and.pencil")
+                                Label("評価を書く", systemImage: "square.and.pencil")
                                     .font(.subheadline)
                             }
                         }
                         .padding(.horizontal)
                         
                         if viewModel.evaluationsForCourse(course.id).isEmpty {
-                            Text("아직 작성된 강의평이 없습니다")
+                            Text("まだ評価が投稿されていません")
                                 .foregroundColor(.gray)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding()
@@ -294,7 +294,7 @@ struct CourseEvaluationDetailView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
-                leading: Button("닫기") {
+                leading: Button("閉じる") {
                     presentationMode.wrappedValue.dismiss()
                 }
             )
@@ -304,7 +304,7 @@ struct CourseEvaluationDetailView: View {
         }
     }
     
-    // 특정 카테고리의 평균 점수 계산 헬퍼 함수
+    // 特定カテゴリーの平均スコア計算ヘルパー関数
     private func averageScore<T>(for keyPath: KeyPath<CourseEvaluation, T>) -> Double where T: RawRepresentable, T.RawValue == Int {
         let evaluations = viewModel.evaluationsForCourse(course.id)
         if evaluations.isEmpty { return 0 }
@@ -314,7 +314,7 @@ struct CourseEvaluationDetailView: View {
     }
 }
 
-// 평가 점수 바 컴포넌트
+// 評価スコアバーコンポーネント
 struct ScoreBarView: View {
     let category: EvaluationCategory
     let score: Double
@@ -352,7 +352,7 @@ struct ScoreBarView: View {
         }
     }
     
-    // 점수에 따른 색상
+    // スコアに基づく色
     private func scoreColor(score: Double) -> Color {
         switch score {
         case 0..<2: return .red
@@ -364,7 +364,7 @@ struct ScoreBarView: View {
     }
 }
 
-// 개별 평가 카드
+// 個別評価カード
 struct EvaluationCard: View {
     let evaluation: CourseEvaluation
     let viewModel: CourseEvaluationViewModel
@@ -427,7 +427,7 @@ struct EvaluationCard: View {
         .padding(.horizontal)
     }
     
-    // 날짜 포맷 변환 헬퍼
+    // 日付フォーマット変換ヘルパー
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy.MM.dd"

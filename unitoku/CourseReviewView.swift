@@ -1,7 +1,7 @@
 // filepath: /Users/junnykim/unitoku/unitoku/CourseReviewView.swift
 import SwiftUI
 
-// 평가 항목 점수 (5점 만점)
+// 評価項目スコア (5点満点)
 enum EvaluationScore: Int, CaseIterable {
     case one = 1
     case two = 2
@@ -30,32 +30,32 @@ enum EvaluationScore: Int, CaseIterable {
     }
 }
 
-// 평가 항목 유형
+// 評価項目タイプ
 enum EvaluationCategory: String, CaseIterable, Identifiable {
-    case overall = "전체 평가"
-    case difficulty = "난이도"
-    case assignments = "과제량"
-    case teaching = "강의력"
-    case grading = "학점 비율"
+    case overall = "全体評価"
+    case difficulty = "難易度"
+    case assignments = "課題量"
+    case teaching = "講義力"
+    case grading = "GPA割合"
     
     var id: String { self.rawValue }
     
     var description: String {
         switch self {
-        case .overall: return "강의에 대한 전반적인 만족도"
-        case .difficulty: return "강의 내용의 난이도"
-        case .assignments: return "과제의 양과 질"
-        case .teaching: return "교수님의 강의 전달력"
-        case .grading: return "학점 분포의 공정성"
+        case .overall: return "講義に対する満足度"
+        case .difficulty: return "講義内容の難易度"
+        case .assignments: return "課題の量と質"
+        case .teaching: return "教授の講義伝達力"
+        case .grading: return "成績分布の公平性"
         }
     }
 }
 
-// 강의평가 모델
+// 講義評価モデル
 struct CourseEvaluation: Identifiable, Hashable {
     var id = UUID()
     var courseId: UUID
-    var authorName: String = "익명" // Default to anonymous
+    var authorName: String = "匿名" // Default to anonymous
     var semester: String // e.g., "2023년 1학기"
     var overallScore: EvaluationScore
     var difficultyScore: EvaluationScore
@@ -66,70 +66,70 @@ struct CourseEvaluation: Identifiable, Hashable {
     var date: Date = Date()
     var likes: Int = 0
     
-    // 평균 점수 계산
+    // 平均スコア計算
     var averageScore: Double {
         let total = overallScore.rawValue + difficultyScore.rawValue +
                     assignmentsScore.rawValue + teachingScore.rawValue + gradingScore.rawValue
         return Double(total) / 5.0
     }
     
-    // 샘플 데이터
+    // サンプルデータ
     static let samples: [CourseEvaluation] = [
         CourseEvaluation(
             courseId: Course.samples[0].id,
-            semester: "2023년 1학기",
+            semester: "2023年 1学期",
             overallScore: .four,
             difficultyScore: .three,
             assignmentsScore: .four,
             teachingScore: .five,
             gradingScore: .three,
-            comment: "강의 내용이 매우 유익했습니다. 실습 시간이 충분해서 좋았고, 교수님의 설명이 명확했습니다. 과제는 적당했지만 마지막 프로젝트는 조금 어려웠습니다."
+            comment: "講義内容がとても有益でした。実習時間が十分あって良かったです。教授の説明が明確でした。課題は適切でしたが、最後のプロジェクトは少し難しかったです。"
         ),
         CourseEvaluation(
             courseId: Course.samples[1].id,
-            semester: "2023년 2학기",
+            semester: "2023年 2学期",
             overallScore: .five,
             difficultyScore: .four,
             assignmentsScore: .three,
             teachingScore: .five,
             gradingScore: .four,
-            comment: "데이터 구조에 대한 깊은 이해를 얻을 수 있었습니다. 교수님이 실제 사례를 많이 들어주셔서 좋았습니다."
+            comment: "データ構造について深い理解を得ることができました。教授が実際の事例をたくさん紹介してくださったので良かったです。"
         ),
         CourseEvaluation(
             courseId: Course.samples[2].id,
-            semester: "2023년 1학기",
+            semester: "2023年 1学期",
             overallScore: .three,
             difficultyScore: .five,
             assignmentsScore: .four,
             teachingScore: .three,
             gradingScore: .two,
-            comment: "내용이 너무 어렵고 과제가 많았습니다. 시험도 까다로웠지만 많이 배운 것 같습니다."
+            comment: "内容がとても難しく課題が多かったです。試験も厳しかったですが多くを学んだと思います。"
         )
     ]
 }
 
-// 코스에 대한 평가 관리 뷰모델
+// コースに対する評価管理ビューモデル
 class CourseEvaluationViewModel: ObservableObject {
     @Published var evaluations: [CourseEvaluation] = CourseEvaluation.samples
     
-    // 특정 코스에 대한 평가만 필터링
+    // 特定のコースに対する評価のみフィルタリング
     func evaluationsForCourse(_ courseId: UUID) -> [CourseEvaluation] {
         return evaluations.filter { $0.courseId == courseId }
     }
     
-    // 새 평가 추가
+    // 新しい評価追加
     func addEvaluation(_ evaluation: CourseEvaluation) {
         evaluations.append(evaluation)
     }
     
-    // 평가 좋아요 증가
+    // 評価いいね増加
     func likeEvaluation(_ evaluationId: UUID) {
         if let index = evaluations.firstIndex(where: { $0.id == evaluationId }) {
             evaluations[index].likes += 1
         }
     }
     
-    // 코스별 평균 평점
+    // コース別平均評価
     func averageScoreForCourse(_ courseId: UUID) -> Double? {
         let courseEvaluations = evaluationsForCourse(courseId)
         if courseEvaluations.isEmpty {
@@ -141,20 +141,20 @@ class CourseEvaluationViewModel: ObservableObject {
     }
 }
 
-// Course 모델 확장
+// Course モデル拡張
 extension Course {
-    // 해당 강의의 평가를 가져오는 메서드
+    // 該当講義の評価を取得するメソッド
     func evaluations(viewModel: CourseEvaluationViewModel) -> [CourseEvaluation] {
         return viewModel.evaluationsForCourse(id)
     }
     
-    // 평균 평점
+    // 平均評価
     func averageRating(viewModel: CourseEvaluationViewModel) -> Double? {
         return viewModel.averageScoreForCourse(id)
     }
 }
 
-// 강의평가 메인 뷰 - 이름을 CourseReviewView에서 DetailedCourseReviewView로 변경
+// 講義評価メインビュー - 名前を CourseReviewView から DetailedCourseReviewView に変更
 struct DetailedCourseReviewView: View {
     @StateObject private var viewModel = CourseEvaluationViewModel()
     @State private var showingAddEvaluation = false
@@ -169,14 +169,10 @@ struct DetailedCourseReviewView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("수강 강의 평가")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .padding(.horizontal)
-                    
-                    // 최근 평가된 강의
+                
+                    // 最近評価された講義
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("최근 평가")
+                        Text("最近の評価")
                             .font(.headline)
                             .padding(.horizontal)
                         
@@ -198,9 +194,9 @@ struct DetailedCourseReviewView: View {
                     Divider()
                         .padding(.vertical, 8)
                     
-                    // 모든 강의 목록
+                    // すべての講義リスト
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("전체 강의")
+                        Text("全ての授業")
                             .font(.headline)
                             .padding(.horizontal)
                         
@@ -219,7 +215,7 @@ struct DetailedCourseReviewView: View {
                 }
                 .padding(.vertical)
             }
-            .navigationTitle("강의평가")
+            .navigationTitle("講義評価")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
@@ -239,7 +235,7 @@ struct DetailedCourseReviewView: View {
     }
 }
 
-// 최근 평가된 강의 카드
+// 最近評価された講義カード
 struct CourseReviewCard: View {
     let course: Course
     let viewModel: CourseEvaluationViewModel
@@ -272,14 +268,14 @@ struct CourseReviewCard: View {
                         .font(.caption)
                         .foregroundColor(.white)
                 } else {
-                    Text("평가 없음")
+                    Text("評価なし")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.8))
                 }
                 
                 Spacer()
                 
-                Text("\(viewModel.evaluationsForCourse(course.id).count)개 평가")
+                Text("\(viewModel.evaluationsForCourse(course.id).count)件の評価")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.8))
             }
@@ -292,7 +288,7 @@ struct CourseReviewCard: View {
     }
 }
 
-// 모든 강의 카드
+// すべての講義カード
 struct CourseGridCard: View {
     let course: Course
     let viewModel: CourseEvaluationViewModel
@@ -327,7 +323,7 @@ struct CourseGridCard: View {
                     Text(String(format: "%.1f", rating))
                         .font(.caption)
                 } else {
-                    Text("평가 없음")
+                    Text("評価なし")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
@@ -349,7 +345,7 @@ struct CourseGridCard: View {
     }
 }
 
-// 강의 평가 상세 화면
+// 講義 評価詳細画面
 struct CourseEvaluationDetailView: View {
     let course: Course
     let viewModel: CourseEvaluationViewModel
@@ -360,7 +356,7 @@ struct CourseEvaluationDetailView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // 강의 정보 헤더
+                    // 講義情報ヘッダー
                     VStack(alignment: .leading, spacing: 8) {
                         Text(course.name)
                             .font(.title)
@@ -370,13 +366,13 @@ struct CourseEvaluationDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         
-                        Text("\(course.weekday.rawValue)요일 \(course.period.timeRange)")
+                        Text("\(course.weekday.rawValue)曜日 \(course.period.timeRange)")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         
                         Divider()
                         
-                        // 평균 평점
+                        // 平均評価
                         if let rating = course.averageRating(viewModel: viewModel) {
                             HStack(spacing: 8) {
                                 Text(String(format: "%.1f", rating))
@@ -390,12 +386,12 @@ struct CourseEvaluationDetailView: View {
                                 
                                 Spacer()
                                 
-                                Text("\(viewModel.evaluationsForCourse(course.id).count)개 평가")
+                                Text("\(viewModel.evaluationsForCourse(course.id).count)件の評価")
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
                             }
                             
-                            // 세부 항목 평점
+                            // 詳細項目評価
                             VStack(alignment: .leading, spacing: 12) {
                                 ScoreBarView(category: .overall, score: averageScore(for: \.overallScore))
                                 ScoreBarView(category: .difficulty, score: averageScore(for: \.difficultyScore))
@@ -405,7 +401,7 @@ struct CourseEvaluationDetailView: View {
                             }
                             .padding(.vertical, 8)
                         } else {
-                            Text("아직 평가가 없습니다")
+                            Text("まだ評価がありません")
                                 .font(.headline)
                                 .foregroundColor(.gray)
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -416,10 +412,10 @@ struct CourseEvaluationDetailView: View {
                     }
                     .padding()
                     
-                    // 평가 목록
+                    // 評価リスト
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
-                            Text("강의평")
+                            Text("講義評価")
                                 .font(.headline)
                             
                             Spacer()
@@ -427,14 +423,14 @@ struct CourseEvaluationDetailView: View {
                             Button(action: {
                                 showingAddEvaluation = true
                             }) {
-                                Label("평가 작성", systemImage: "square.and.pencil")
+                                Label("評価作成", systemImage: "square.and.pencil")
                                     .font(.subheadline)
                             }
                         }
                         .padding(.horizontal)
                         
                         if viewModel.evaluationsForCourse(course.id).isEmpty {
-                            Text("아직 작성된 강의평이 없습니다")
+                            Text("まだ作成された講義評価がありません")
                                 .foregroundColor(.gray)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding()
@@ -448,7 +444,7 @@ struct CourseEvaluationDetailView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
-                leading: Button("닫기") {
+                leading: Button("閉じる") {
                     presentationMode.wrappedValue.dismiss()
                 }
             )
@@ -458,7 +454,7 @@ struct CourseEvaluationDetailView: View {
         }
     }
     
-    // 특정 카테고리의 평균 점수 계산 헬퍼 함수
+    // 特定カテゴリの平均スコア計算ヘルパー関数
     private func averageScore<T>(for keyPath: KeyPath<CourseEvaluation, T>) -> Double where T: RawRepresentable, T.RawValue == Int {
         let evaluations = viewModel.evaluationsForCourse(course.id)
         if evaluations.isEmpty { return 0 }
@@ -468,7 +464,7 @@ struct CourseEvaluationDetailView: View {
     }
 }
 
-// 평가 점수 바 컴포넌트
+// 評価スコアバーコンポーネント
 struct ScoreBarView: View {
     let category: EvaluationCategory
     let score: Double
@@ -507,7 +503,7 @@ struct ScoreBarView: View {
         }
     }
     
-    // 점수에 따른 색상
+    // スコアに応じた色
     private func scoreColor(score: Double) -> Color {
         switch score {
         case 0..<2: return .red
@@ -519,7 +515,7 @@ struct ScoreBarView: View {
     }
 }
 
-// 개별 평가 카드
+// 個別評価カード
 struct EvaluationCard: View {
     let evaluation: CourseEvaluation
     let viewModel: CourseEvaluationViewModel
@@ -582,7 +578,7 @@ struct EvaluationCard: View {
         .padding(.horizontal)
     }
     
-    // 날짜 포맷 변환 헬퍼
+    // 日付フォーマット変換ヘルパー
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy.MM.dd"
@@ -590,7 +586,7 @@ struct EvaluationCard: View {
     }
 }
 
-// 새 평가 작성 화면
+// 新しい評価作成画面
 struct NewEvaluationView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var viewModel: CourseEvaluationViewModel
@@ -599,8 +595,8 @@ struct NewEvaluationView: View {
     var courseId: UUID?
     
     @State private var selectedCourse: Course?
-    @State private var semester: String = "\(Calendar.current.component(.year, from: Date()))년 \(Calendar.current.component(.month, from: Date()) <= 6 ? "1" : "2")학기" // Default to current semester
-    @State private var authorName: String = "익명"
+    @State private var semester: String = "\(Calendar.current.component(.year, from: Date()))年 \(Calendar.current.component(.month, from: Date()) <= 6 ? "1" : "2")学期" // Default to current semester
+    @State private var authorName: String = "匿名"
     @State private var comment: String = ""
     @State private var overallScore: EvaluationScore = .three
     @State private var difficultyScore: EvaluationScore = .three
@@ -611,11 +607,11 @@ struct NewEvaluationView: View {
     var body: some View {
         NavigationView {
             Form {
-                // 강의 선택 (사전 선택된 강의가 없을 경우에만)
+                // 講義選択 (事前選択された講義がない場合のみ)
                 if courseId == nil {
-                    Section(header: Text("강의 선택")) {
-                        Picker("강의", selection: $selectedCourse) {
-                            Text("강의를 선택하세요").tag(nil as Course?)
+                    Section(header: Text("講義選択")) {
+                        Picker("講義", selection: $selectedCourse) {
+                            Text("講義を選択してください").tag(nil as Course?)
                             ForEach(Course.samples) { course in
                                 Text("\(course.name) (\(course.professor))").tag(course as Course?)
                             }
@@ -623,13 +619,13 @@ struct NewEvaluationView: View {
                     }
                 }
                 
-                // 학기 정보
-                Section(header: Text("학기")) {
-                    TextField("학기", text: $semester)
+                // 学期情報
+                Section(header: Text("学期")) {
+                    TextField("学期", text: $semester)
                 }
                 
-                // 평점 정보
-                Section(header: Text("평가 점수")) {
+                // 評点情報
+                Section(header: Text("評価点数")) {
                     ScoreSelectionView(title: EvaluationCategory.overall.rawValue, description: EvaluationCategory.overall.description, score: $overallScore)
                     ScoreSelectionView(title: EvaluationCategory.difficulty.rawValue, description: EvaluationCategory.difficulty.description, score: $difficultyScore)
                     ScoreSelectionView(title: EvaluationCategory.assignments.rawValue, description: EvaluationCategory.assignments.description, score: $assignmentsScore)
@@ -637,23 +633,23 @@ struct NewEvaluationView: View {
                     ScoreSelectionView(title: EvaluationCategory.grading.rawValue, description: EvaluationCategory.grading.description, score: $gradingScore)
                 }
                 
-                // 평가 코멘트
-                Section(header: Text("강의평")) {
+                // 評価コメント
+                Section(header: Text("講義評価")) {
                     TextEditor(text: $comment)
                         .frame(minHeight: 150)
                 }
                 
-                // 작성자 정보
-                Section(header: Text("작성자")) {
-                    TextField("이름 (익명 가능)", text: $authorName)
+                // 作成者情報
+                Section(header: Text("作成者")) {
+                    TextField("名前（匿名可能）", text: $authorName)
                 }
             }
-            .navigationTitle("강의평가 작성")
+            .navigationTitle("講義評価作成")
             .navigationBarItems(
-                leading: Button("취소") {
+                leading: Button("キャンセル") {
                     presentationMode.wrappedValue.dismiss()
                 },
-                trailing: Button("등록") {
+                trailing: Button("登録") {
                     submitEvaluation()
                 }
                 .disabled(!isFormValid)
@@ -666,16 +662,16 @@ struct NewEvaluationView: View {
         }
     }
     
-    // 입력 폼 유효성 검증
+    // 入力フォームの有効性検証
     private var isFormValid: Bool {
         let courseSelected = courseId != nil || selectedCourse != nil
         let hasComment = !comment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         return courseSelected && hasComment
     }
     
-    // 평가 제출
+    // 評価提出
     private func submitEvaluation() {
-        // courseId가 직접 전달됐거나 선택된 강의가 있어야 함
+        // courseIdが直接渡されたか、選択された講義が必要
         guard let course = courseId != nil ? Course.samples.first(where: { $0.id == courseId }) : selectedCourse else {
             return
         }
@@ -698,7 +694,7 @@ struct NewEvaluationView: View {
     }
 }
 
-// 점수 선택 컴포넌트
+// スコア選択コンポーネント
 struct ScoreSelectionView: View {
     let title: String
     let description: String

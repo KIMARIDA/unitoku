@@ -42,7 +42,7 @@ struct MainTabView: View {
             }
             .accentColor(Color.appTheme)
             .onAppear {
-                // 네비게이션 알림 리스너 설정
+                // ナビゲーション通知リスナーの設定
                 NotificationCenter.default.addObserver(
                     forName: Notification.Name("navigateToPost"),
                     object: nil,
@@ -56,7 +56,7 @@ struct MainTabView: View {
                 }
             }
             
-            // 게시물 상세 화면을 오버레이로 표시
+            // 投稿詳細画面をオーバーレイとして表示
             if isShowingPostDetail, let postId = navigateToPostId {
                 NavigationView {
                     PostDetailView(postId: postId, hideBackButton: true)
@@ -72,7 +72,7 @@ struct MainTabView: View {
                         })
                 }
                 .transition(.move(edge: .trailing))
-                .zIndex(1) // 최상단에 표시
+                .zIndex(1) // 最上層に表示
             }
         }
         .animation(.easeInOut(duration: 0.3), value: isShowingPostDetail)
@@ -225,7 +225,7 @@ struct TimeTableView: View {
         }) {
             HStack {
                 Image(systemName: "list.bullet")
-                Text("授業一覧を表示")
+                Text("授業一覧")
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
@@ -573,7 +573,7 @@ class TimeTableViewModel: ObservableObject {
     }
 }
 
-// プレースホルダービュー - DetailedCourseReviewView는 CourseReviewView.swift에서 구현됨
+// プレースホルダービュー - DetailedCourseReviewViewはCourseReviewView.swiftに実装済み
 
 struct ChatView: View {
     var body: some View {
