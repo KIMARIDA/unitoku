@@ -35,23 +35,23 @@ enum EvaluationCategory: String, CaseIterable, Identifiable {
     case overall = "全体評価"
     case difficulty = "難易度"
     case assignments = "課題量"
-    case teaching = "講義力"
+    case teaching = "授業力"
     case grading = "GPA割合"
     
     var id: String { self.rawValue }
     
     var description: String {
         switch self {
-        case .overall: return "講義に対する満足度"
-        case .difficulty: return "講義内容の難易度"
+        case .overall: return "授業に対する満足度"
+        case .difficulty: return "授業内容の難易度"
         case .assignments: return "課題の量と質"
-        case .teaching: return "教授の講義伝達力"
+        case .teaching: return "教授の授業伝達力"
         case .grading: return "成績分布の公平性"
         }
     }
 }
 
-// 講義評価モデル
+// 授業評価モデル
 struct CourseEvaluation: Identifiable, Hashable {
     var id = UUID()
     var courseId: UUID
@@ -83,7 +83,7 @@ struct CourseEvaluation: Identifiable, Hashable {
             assignmentsScore: .four,
             teachingScore: .five,
             gradingScore: .three,
-            comment: "講義内容がとても有益でした。実習時間が十分あって良かったです。教授の説明が明確でした。課題は適切でしたが、最後のプロジェクトは少し難しかったです。"
+            comment: "授業内容がとても有益でした。実習時間が十分あって良かったです。教授の説明が明確でした。課題は適切でしたが、最後のプロジェクトは少し難しかったです。"
         ),
         CourseEvaluation(
             courseId: Course.samples[1].id,
@@ -143,7 +143,7 @@ class CourseEvaluationViewModel: ObservableObject {
 
 // Course モデル拡張
 extension Course {
-    // 該当講義の評価を取得するメソッド
+    // 該当授業の評価を取得するメソッド
     func evaluations(viewModel: CourseEvaluationViewModel) -> [CourseEvaluation] {
         return viewModel.evaluationsForCourse(id)
     }
@@ -154,7 +154,7 @@ extension Course {
     }
 }
 
-// 講義評価メインビュー - 名前を CourseReviewView から DetailedCourseReviewView に変更
+// 授業評価メインビュー - 名前を CourseReviewView から DetailedCourseReviewView に変更
 struct DetailedCourseReviewView: View {
     @StateObject private var viewModel = CourseEvaluationViewModel()
     @State private var showingAddEvaluation = false
@@ -170,7 +170,7 @@ struct DetailedCourseReviewView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                 
-                    // 最近評価された講義
+                    // 最近評価された授業
                     VStack(alignment: .leading, spacing: 8) {
                         Text("最近の評価")
                             .font(.headline)
@@ -194,7 +194,7 @@ struct DetailedCourseReviewView: View {
                     Divider()
                         .padding(.vertical, 8)
                     
-                    // すべての講義リスト
+                    // すべての授業リスト
                     VStack(alignment: .leading, spacing: 8) {
                         Text("全ての授業")
                             .font(.headline)
@@ -215,7 +215,7 @@ struct DetailedCourseReviewView: View {
                 }
                 .padding(.vertical)
             }
-            .navigationTitle("講義評価")
+            .navigationTitle("授業評価")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
@@ -235,7 +235,7 @@ struct DetailedCourseReviewView: View {
     }
 }
 
-// 最近評価された講義カード
+// 最近評価された授業カード
 struct CourseReviewCard: View {
     let course: Course
     let viewModel: CourseEvaluationViewModel
@@ -284,7 +284,7 @@ struct CourseReviewCard: View {
     }
 }
 
-// すべての講義カード
+// すべての授業カード
 struct CourseGridCard: View {
     let course: Course
     let viewModel: CourseEvaluationViewModel
@@ -335,7 +335,7 @@ struct CourseGridCard: View {
     }
 }
 
-// 講義 評価詳細画面
+// 授業 評価詳細画面
 struct CourseEvaluationDetailView: View {
     let course: Course
     let viewModel: CourseEvaluationViewModel
@@ -346,7 +346,7 @@ struct CourseEvaluationDetailView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // 講義情報ヘッダー
+                    // 授業情報ヘッダー
                     VStack(alignment: .leading, spacing: 8) {
                         Text(course.name)
                             .font(.title)
@@ -401,7 +401,7 @@ struct CourseEvaluationDetailView: View {
                     // 評価リスト
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
-                            Text("講義評価")
+                            Text("授業評価")
                                 .font(.headline)
                             
                             Spacer()
@@ -416,7 +416,7 @@ struct CourseEvaluationDetailView: View {
                         .padding(.horizontal)
                         
                         if viewModel.evaluationsForCourse(course.id).isEmpty {
-                            Text("まだ作成された講義評価がありません")
+                            Text("まだ作成された授業評価がありません")
                                 .foregroundColor(.gray)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding()
@@ -593,11 +593,11 @@ struct NewEvaluationView: View {
     var body: some View {
         NavigationView {
             Form {
-                // 講義選択 (事前選択された講義がない場合のみ)
+                // 授業選択 (事前選択された授業がない場合のみ)
                 if courseId == nil {
-                    Section(header: Text("講義選択")) {
-                        Picker("講義", selection: $selectedCourse) {
-                            Text("講義を選択してください").tag(nil as Course?)
+                    Section(header: Text("授業選択")) {
+                        Picker("授業", selection: $selectedCourse) {
+                            Text("授業を選択してください").tag(nil as Course?)
                             ForEach(Course.samples) { course in
                                 Text("\(course.name) (\(course.professor))").tag(course as Course?)
                             }
@@ -620,7 +620,7 @@ struct NewEvaluationView: View {
                 }
                 
                 // 評価コメント
-                Section(header: Text("講義評価")) {
+                Section(header: Text("授業評価")) {
                     TextEditor(text: $comment)
                         .frame(minHeight: 150)
                 }
@@ -630,7 +630,7 @@ struct NewEvaluationView: View {
                     TextField("名前（匿名可能）", text: $authorName)
                 }
             }
-            .navigationTitle("講義評価作成")
+            .navigationTitle("授業評価作成")
             .navigationBarItems(
                 leading: Button("キャンセル") {
                     presentationMode.wrappedValue.dismiss()
@@ -657,7 +657,7 @@ struct NewEvaluationView: View {
     
     // 評価提出
     private func submitEvaluation() {
-        // courseIdが直接渡されたか、選択された講義が必要
+        // courseIdが直接渡されたか、選択された授業が必要
         guard let course = courseId != nil ? Course.samples.first(where: { $0.id == courseId }) : selectedCourse else {
             return
         }
