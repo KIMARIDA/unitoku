@@ -102,7 +102,7 @@ struct PostDetailView: View {
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             
-                            Text(post?.timestamp ?? Date(), formatter: itemFormatter)
+                            Text((post?.timestamp ?? Date()).relativeTimeInJapanese())
                                 .font(.caption)
                                 .foregroundColor(.gray)
                         }
