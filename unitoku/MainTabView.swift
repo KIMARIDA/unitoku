@@ -241,39 +241,39 @@ struct TimeTableView: View {
     private func courseCell(for weekday: Weekday, at period: Period) -> some View {
         let course = viewModel.courseFor(weekday: weekday, period: period)
         
-        if let course = course {
-            // 授業があるセルの内容
-            courseCellContent(course: course)
-        } else if editMode {
-            // 編集モードで授業がない場合は追加ボタン
-            Button(action: {
-                newCourse = Course(
-                    name: "",
-                    professor: "",
-                    room: "",
-                    weekday: weekday,
-                    period: period,
-                    color: viewModel.randomColor()
-                )
-                showingNewCourseSheet = true
-            }) {
-                Image(systemName: "plus")
-                    .foregroundColor(.gray)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+        ZStack {
+            if let course = course {
+                // 授業があるセルの内容
+                courseCellContent(course: course)
+            } else if editMode {
+                // 編集モードで授業がない場合は追加ボタン
+                Button(action: {
+                    newCourse = Course(
+                        name: "",
+                        professor: "",
+                        room: "",
+                        weekday: weekday,
+                        period: period,
+                        color: viewModel.randomColor()
+                    )
+                    showingNewCourseSheet = true
+                }) {
+                    Image(systemName: "plus")
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.gray.opacity(0.1))
             }
-            .background(Color.gray.opacity(0.1))
-        } else {
-            // 授業がなくて編集モードでもない場合は空セル
-            emptyCell()
         }
+        .frame(maxWidth: .infinity)
+        .frame(height: 80)
     }
     
     // 空のセル
     private func emptyCell() -> some View {
         Rectangle()
             .fill(Color.clear)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .aspectRatio(1.0, contentMode: .fill)
+            .contentShape(Rectangle())
     }
     
     // 授業があるセルの内容
@@ -301,6 +301,8 @@ struct TimeTableView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .background(course.color)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .contentShape(Rectangle())
         .contextMenu {
             Button(action: {
                 showingCourseDetail = course
