@@ -230,7 +230,7 @@ struct TimeTableView: View {
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
-            .background(Color.blue)
+            .background(Color.appTheme)
             .cornerRadius(10)
             .padding()
         }

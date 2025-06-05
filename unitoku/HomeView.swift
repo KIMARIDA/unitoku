@@ -261,6 +261,7 @@ struct HomeView: View {
                                 Image(systemName: hasUnreadNotifications ? "bell.badge" : "bell")
                                     .foregroundColor(Color(hex: "fd72ae"))
                                     .imageScale(.large)
+
                             }
                         }
                         

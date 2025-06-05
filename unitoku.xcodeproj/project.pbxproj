@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CED67B062DF188E200781A06 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = CED67B052DF188E200781A06 /* Localizable.xcstrings */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CE50CB192DE8598B0088029C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		CE50CB062DE8598A0088029C /* unitoku.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = unitoku.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE50CB182DE8598B0088029C /* unitokuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = unitokuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE50CB222DE8598B0088029C /* unitokuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = unitokuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CED67B052DF188E200781A06 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -88,6 +93,7 @@
 		CE50CAFD2DE8598A0088029C = {
 			isa = PBXGroup;
 			children = (
+				CED67B052DF188E200781A06 /* Localizable.xcstrings */,
 				CE50CB082DE8598A0088029C /* unitoku */,
 				CE50CB1B2DE8598B0088029C /* unitokuTests */,
 				CE50CB252DE8598B0088029C /* unitokuUITests */,
@@ -200,11 +206,13 @@
 				};
 			};
 			buildConfigurationList = CE50CB012DE8598A0088029C /* Build configuration list for PBXProject "unitoku" */;
-			developmentRegion = en;
+			developmentRegion = ja;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				ko,
+				ja,
 			);
 			mainGroup = CE50CAFD2DE8598A0088029C;
 			minimizedProjectReferenceProxies = 1;
@@ -225,6 +233,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CED67B062DF188E200781A06 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,6 +350,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -397,6 +407,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -412,6 +423,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = unitoku/Info.plist;
 				"INFOPLIST_FILE[sdk=*]" = unitoku/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "ユニトク";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -441,6 +453,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = unitoku/Info.plist;
 				"INFOPLIST_FILE[sdk=*]" = unitoku/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "ユニトク";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
