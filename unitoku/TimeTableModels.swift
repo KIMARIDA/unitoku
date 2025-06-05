@@ -10,6 +10,38 @@ enum Weekday: String, CaseIterable, Identifiable {
     case friday = "金"
     
     var id: String { self.rawValue }
+    
+    // 日付から曜日を取得するための静的メソッド
+    static func fromDate(_ date: Date) -> Weekday {
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: date)
+        
+        // Calendar.currentでは日曜日が1、土曜日が7
+        switch weekday {
+        case 2: return .monday
+        case 3: return .tuesday
+        case 4: return .wednesday
+        case 5: return .thursday
+        case 6: return .friday
+        default: return .monday // 土日の場合はデフォルトで月曜日
+        }
+    }
+    
+    // 完全な曜日名を返す
+    var fullName: String {
+        switch self {
+        case .monday: return "月曜日"
+        case .tuesday: return "火曜日"
+        case .wednesday: return "水曜日"
+        case .thursday: return "木曜日"
+        case .friday: return "金曜日"
+        }
+    }
+    
+    // 短い曜日名を返す
+    var shortName: String {
+        return self.rawValue
+    }
 }
 
 // 時間帯の列挙型

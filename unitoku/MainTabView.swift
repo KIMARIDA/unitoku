@@ -22,7 +22,7 @@ struct MainTabView: View {
                     }
                     .tag(1)
                 
-                CourseReviewView()
+                DetailedCourseReviewView()
                     .tabItem {
                         Label("授業評価", systemImage: "star")
                     }
@@ -573,14 +573,7 @@ class TimeTableViewModel: ObservableObject {
     }
 }
 
-// プレースホルダービュー
-struct CourseReviewView: View {
-    var body: some View {
-        Text("授業評価画面")
-            .font(.largeTitle)
-            .foregroundColor(.gray)
-    }
-}
+// プレースホルダービュー - DetailedCourseReviewView는 CourseReviewView.swift에서 구현됨
 
 struct ChatView: View {
     var body: some View {
