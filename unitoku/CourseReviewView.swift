@@ -273,11 +273,7 @@ struct CourseReviewCard: View {
                         .foregroundColor(.white.opacity(0.8))
                 }
                 
-                Spacer()
-                
-                Text("\(viewModel.evaluationsForCourse(course.id).count)件の評価")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.8))
+
             }
         }
         .padding()
