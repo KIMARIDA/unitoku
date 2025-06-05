@@ -325,12 +325,6 @@ struct CourseGridCard: View {
                 }
                 
                 Spacer()
-                
-                Text("\(viewModel.evaluationsForCourse(course.id).count)")
-                    .font(.caption)
-                    .padding(4)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(8)
             }
         }
         .padding()
@@ -381,11 +375,7 @@ struct CourseEvaluationDetailView: View {
                                 }
                                 
                                 Spacer()
-                                
-                                Text("\(viewModel.evaluationsForCourse(course.id).count)件の評価")
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-                            }
+                            } // Added missing closing bracket for HStack
                             
                             // 詳細項目評価
                             VStack(alignment: .leading, spacing: 12) {
