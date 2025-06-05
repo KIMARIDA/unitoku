@@ -46,18 +46,25 @@ struct Course: Identifiable, Hashable {
     var period: Period
     var color: Color
     
-    // 色のオプション
+    // 色のオプション - パステルカラー
     static let colors: [Color] = [
-        .blue, .green, .orange, .purple, .red, .pink, .yellow, .teal
+        .blue.opacity(0.9),
+        .pink.opacity(0.9),
+        .mint.opacity(0.9),
+        .purple.opacity(0.9),
+        .yellow.opacity(0.9),
+        .teal.opacity(0.9),
+        .orange.opacity(0.9),
+        .green.opacity(0.9)
     ]
     
     // サンプルデータ
     static let samples: [Course] = [
-        Course(name: "プログラミング基礎", professor: "鈴木教授", room: "情報1-301", weekday: .monday, period: .first, color: .blue),
-        Course(name: "データ構造", professor: "佐藤教授", room: "情報1-201", weekday: .monday, period: .third, color: .green),
-        Course(name: "確率統計", professor: "田中教授", room: "理工3-101", weekday: .tuesday, period: .second, color: .orange),
-        Course(name: "情報倫理", professor: "伊藤教授", room: "共通2-501", weekday: .wednesday, period: .fourth, color: .purple),
-        Course(name: "人工知能概論", professor: "高橋教授", room: "情報2-401", weekday: .thursday, period: .first, color: .red),
-        Course(name: "データベース", professor: "山本教授", room: "情報1-302", weekday: .friday, period: .second, color: .pink)
+        Course(name: "プログラミング基礎", professor: "鈴木教授", room: "情報1-301", weekday: .monday, period: .first, color: colors[0]),
+        Course(name: "データ構造", professor: "佐藤教授", room: "情報1-201", weekday: .monday, period: .third, color: colors[7]),
+        Course(name: "確率統計", professor: "田中教授", room: "理工3-101", weekday: .tuesday, period: .second, color: colors[6]),
+        Course(name: "情報倫理", professor: "伊藤教授", room: "共通2-501", weekday: .wednesday, period: .fourth, color: colors[3]),
+        Course(name: "人工知能概論", professor: "高橋教授", room: "情報2-401", weekday: .thursday, period: .first, color: colors[1]),
+        Course(name: "データベース", professor: "山本教授", room: "情報1-302", weekday: .friday, period: .second, color: colors[2])
     ]
 }
