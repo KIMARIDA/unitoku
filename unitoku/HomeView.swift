@@ -169,7 +169,9 @@ struct HomeView: View {
                                 }
                                 .buttonStyle(BorderlessButtonStyle()) // 정렬 버튼 탭 영역 분리
                                 
-                                // 既読リスト 버튼 추가
+                                Spacer()
+                                
+                                // 既読 버튼 (오른쪽에 위치)
                                 Button(action: {
                                     isShowingReadPostsList.toggle()
                                 }) {
@@ -188,8 +190,6 @@ struct HomeView: View {
                                     .frame(height: 32)
                                 }
                                 .buttonStyle(BorderlessButtonStyle())
-                                
-                                Spacer()
                             }
                             .padding(.horizontal)
                             .padding(.bottom, 8)
