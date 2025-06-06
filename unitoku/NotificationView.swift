@@ -213,7 +213,7 @@ struct NotificationRow: View {
             case .comment:
                 Image(systemName: "bubble.left.fill")
             case .system:
-                Image(systemName: "bell.fill")
+                Image(systemName: "arrow.clockwise")
             case .mention:
                 Image(systemName: "at")
             }
@@ -223,7 +223,7 @@ struct NotificationRow: View {
     var iconColor: Color {
         switch notification.type {
         case .like:
-            return Color(hex: "FF3B30")
+            return Color.appTheme
         case .comment:
             return Color(hex: "007AFF")
         case .system:
