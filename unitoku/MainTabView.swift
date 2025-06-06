@@ -104,10 +104,6 @@ struct TimeTableView: View {
             .navigationTitle("時間割")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    addButton
-                }
-                
-                ToolbarItem(placement: .navigationBarLeading) {
                     editButton
                 }
             }

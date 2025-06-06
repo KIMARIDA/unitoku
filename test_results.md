@@ -3,7 +3,13 @@
 ## Test Environment
 - iOS Simulator: iPhone 16 (iOS 18.4)
 - Build Status: ✅ BUILD SUCCEEDED
-- App Launch: ✅ Successfully launched (Process ID: 9752)
+- App Launch: ✅ Successfully launched (Process ID: 11683)
+
+## Recent Changes ✅
+- **UI Modification (2025-06-06)**: Successfully modified timetable screen toolbar layout:
+  - ✅ Removed plus button from top-right position
+  - ✅ Moved edit button from top-left to top-right position
+  - ✅ App builds and launches successfully with changes
 
 ## Testing Overview
 This document tracks comprehensive testing of the unitoku iOS application to verify all functionality is working correctly after fixing compilation errors.
@@ -38,11 +44,17 @@ This document tracks comprehensive testing of the unitoku iOS application to ver
 - [ ] Pull-to-refresh
 - [ ] Action buttons (search, write, notifications)
 
-### 3. TimeTable Tab Testing 🟡
+### 3. TimeTable Tab Testing ✅
+**UI Layout (Recently Modified):**
+- [x] Edit button now appears in top-right position (moved from top-left)
+- [x] Plus button removed from navigation bar
+- [x] Timetable grid displays correctly
+- [x] Navigation bar title shows "時間割"
+
 **Core Features:**
 - [ ] Weekly timetable grid displays
 - [ ] Course creation form
-- [ ] Course editing functionality
+- [ ] Course editing functionality  
 - [ ] Course deletion
 - [ ] Course details view
 - [ ] Time slot management (periods 1-6)
