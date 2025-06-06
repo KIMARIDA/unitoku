@@ -84,6 +84,7 @@ struct TimeTableView: View {
     @StateObject private var viewModel = TimeTableViewModel()
     @State private var showingCourseDetail: Course? = nil
     @State private var showingNewCourseSheet = false
+    @State private var showingCourseList = false
     @State private var editMode = false
     @State private var newCourse = Course(name: "", professor: "", room: "", weekday: .monday, period: .first, color: .blue)
     
@@ -116,6 +117,9 @@ struct TimeTableView: View {
             }
             .sheet(item: $showingCourseDetail) { course in
                 CourseDetailView(course: course, viewModel: viewModel)
+            }
+            .sheet(isPresented: $showingCourseList) {
+                CourseListView(viewModel: viewModel)
             }
         }
     }
@@ -217,7 +221,7 @@ struct TimeTableView: View {
     // コース一覧ボタン
     private var courseListButton: some View {
         Button(action: {
-            // View all courses in a list
+            showingCourseList = true
         }) {
             HStack {
                 Image(systemName: "list.bullet")
