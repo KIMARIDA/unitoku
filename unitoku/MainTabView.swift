@@ -301,7 +301,10 @@ struct TimeTableView: View {
             }
             .padding(4)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(course.color)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(course.color)
+            )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Rectangle())
