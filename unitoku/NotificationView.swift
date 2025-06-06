@@ -225,9 +225,9 @@ struct NotificationRow: View {
         case .like:
             return Color.appTheme
         case .comment:
-            return Color(hex: "007AFF")
+            return Color.appTheme
         case .system:
-            return Color(hex: "FF9500")
+            return Color.gray
         case .mention:
             return Color(hex: "5856D6")
         }
