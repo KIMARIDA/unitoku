@@ -575,14 +575,6 @@ class TimeTableViewModel: ObservableObject {
 
 // プレースホルダービュー - DetailedCourseReviewViewはCourseReviewView.swiftに実装済み
 
-struct ChatView: View {
-    var body: some View {
-        Text("チャット画面")
-            .font(.largeTitle)
-            .foregroundColor(.gray)
-    }
-}
-
 struct MoreView: View {
     var body: some View {
         Text("その他の設定")

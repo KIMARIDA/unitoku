@@ -1,4 +1,3 @@
-// filepath: /Users/junnykim/unitoku/unitoku/CourseReviewView.swift
 import SwiftUI
 
 // 評価項目スコア (5点満点)
@@ -76,7 +75,7 @@ struct CourseEvaluation: Identifiable, Hashable {
     // サンプルデータ
     static let samples: [CourseEvaluation] = [
         CourseEvaluation(
-            courseId: Course.samples[0].id,
+            courseId: UUID(uuidString: "12345678-1234-1234-1234-123456789012") ?? UUID(),
             semester: "2023年 1学期",
             overallScore: .four,
             difficultyScore: .three,
@@ -86,7 +85,7 @@ struct CourseEvaluation: Identifiable, Hashable {
             comment: "授業内容がとても有益でした。実習時間が十分あって良かったです。教授の説明が明確でした。課題は適切でしたが、最後のプロジェクトは少し難しかったです。"
         ),
         CourseEvaluation(
-            courseId: Course.samples[1].id,
+            courseId: UUID(uuidString: "12345678-1234-1234-1234-123456789013") ?? UUID(),
             semester: "2023年 2学期",
             overallScore: .five,
             difficultyScore: .four,
@@ -96,7 +95,7 @@ struct CourseEvaluation: Identifiable, Hashable {
             comment: "データ構造について深い理解を得ることができました。教授が実際の事例をたくさん紹介してくださったので良かったです。"
         ),
         CourseEvaluation(
-            courseId: Course.samples[2].id,
+            courseId: UUID(uuidString: "12345678-1234-1234-1234-123456789014") ?? UUID(),
             semester: "2023年 1学期",
             overallScore: .three,
             difficultyScore: .five,
@@ -217,7 +216,7 @@ struct DetailedCourseReviewView: View {
             }
             .navigationTitle("授業評価")
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .primaryAction) {
                     Button(action: {
                         showingAddEvaluation = true
                     }) {
@@ -329,7 +328,7 @@ struct CourseGridCard: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(Color(.systemBackground))
+        .background(Color.white)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
@@ -429,11 +428,13 @@ struct CourseEvaluationDetailView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button("閉じる") {
-                    presentationMode.wrappedValue.dismiss()
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("閉じる") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }
-            )
+            }
             .sheet(isPresented: $showingAddEvaluation) {
                 NewEvaluationView(viewModel: viewModel, courseId: course.id)
             }
@@ -558,7 +559,7 @@ struct EvaluationCard: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.white)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
         .padding(.horizontal)
@@ -631,15 +632,19 @@ struct NewEvaluationView: View {
                 }
             }
             .navigationTitle("授業評価作成")
-            .navigationBarItems(
-                leading: Button("キャンセル") {
-                    presentationMode.wrappedValue.dismiss()
-                },
-                trailing: Button("登録") {
-                    submitEvaluation()
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("キャンセル") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }
-                .disabled(!isFormValid)
-            )
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("登録") {
+                        submitEvaluation()
+                    }
+                    .disabled(!isFormValid)
+                }
+            }
         }
         .onAppear {
             if let id = courseId {
