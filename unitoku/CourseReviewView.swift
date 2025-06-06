@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 // 評価項目スコア (5点満点)
 enum EvaluationScore: Int, CaseIterable {

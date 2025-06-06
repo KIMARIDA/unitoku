@@ -575,14 +575,6 @@ class TimeTableViewModel: ObservableObject {
 
 // プレースホルダービュー - DetailedCourseReviewViewはCourseReviewView.swiftに実装済み
 
-struct MoreView: View {
-    var body: some View {
-        Text("その他の設定")
-            .font(.largeTitle)
-            .foregroundColor(.gray)
-    }
-}
-
 #Preview {
     MainTabView()
         .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
