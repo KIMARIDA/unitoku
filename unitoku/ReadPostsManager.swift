@@ -64,6 +64,16 @@ class ReadPostsManager {
     func clearAllReadPosts() {
         UserDefaults.standard.removeObject(forKey: readPostsKey)
     }
+    
+    // Delete a specific read post
+    func deleteReadPost(postID: UUID) {
+        var readPosts = getReadPosts()
+        readPosts.removeAll { $0.id == postID }
+        
+        if let encodedData = try? JSONEncoder().encode(readPosts) {
+            UserDefaults.standard.set(encodedData, forKey: readPostsKey)
+        }
+    }
 }
 
 // Model for a read post
