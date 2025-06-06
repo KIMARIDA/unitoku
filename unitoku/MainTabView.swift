@@ -154,12 +154,11 @@ struct TimeTableView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
                     .background(
-                        RoundedRectangle(cornerRadius: 0)
+                        RoundedRectangle(cornerRadius: 10)
                             .fill(Color.blue.opacity(0.1))
                     )
             }
         }
-        .background(Color(.systemGray5))
     }
     
     // 時限の行
