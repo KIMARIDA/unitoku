@@ -12,48 +12,46 @@ struct ChatView: View {
     var body: some View {
         NavigationView {
             List {
-                Section(header: Text("チャット").font(.headline)) {
-                    ForEach(viewModel.chatRooms) { room in
-                        NavigationLink(destination: ChatDetailView(room: room, viewModel: viewModel)) {
-                            HStack {
-                                // Chat icon (group or individual)
-                                Image(systemName: room.isGroup ? "person.3.fill" : "person.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24, height: 24)
-                                    .padding(8)
-                                    .background(Color.appTheme.opacity(0.2))
-                                    .clipShape(Circle())
+                ForEach(viewModel.chatRooms) { room in
+                    NavigationLink(destination: ChatDetailView(room: room, viewModel: viewModel)) {
+                        HStack {
+                            // Chat icon (group or individual)
+                            Image(systemName: room.isGroup ? "person.3.fill" : "person.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                                .padding(8)
+                                .background(Color.appTheme.opacity(0.2))
+                                .clipShape(Circle())
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(room.name)
+                                    .font(.headline)
                                 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(room.name)
-                                        .font(.headline)
-                                    
-                                    Text(room.lastMessage.isEmpty ? "新しい会話" : room.lastMessage)
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
-                                        .lineLimit(1)
-                                }
+                                Text(room.lastMessage.isEmpty ? "新しい会話" : room.lastMessage)
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                    .lineLimit(1)
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .trailing, spacing: 2) {
+                                Text(formatDate(room.lastMessageTime))
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
                                 
-                                Spacer()
-                                
-                                VStack(alignment: .trailing, spacing: 2) {
-                                    Text(formatDate(room.lastMessageTime))
+                                if room.unreadCount > 0 {
+                                    Text("\(room.unreadCount)")
                                         .font(.caption)
-                                        .foregroundColor(.gray)
-                                    
-                                    if room.unreadCount > 0 {
-                                        Text("\(room.unreadCount)")
-                                            .font(.caption)
-                                            .padding(5)
-                                            .background(Color.appTheme)
-                                            .foregroundColor(.white)
-                                            .clipShape(Circle())
-                                    }
+                                        .padding(5)
+                                        .background(Color.appTheme)
+                                        .foregroundColor(.white)
+                                        .clipShape(Circle())
                                 }
                             }
-                            .padding(.vertical, 4)
                         }
+                        .padding(.vertical, 4)
                     }
                 }
             }
