@@ -42,6 +42,7 @@ struct HomeView: View {
     @State private var refreshID = UUID() // 화면 강제 새로고침용 ID
     @State private var isShowingNotifications = false // 알림 보기 상태
     @State private var hasUnreadNotifications = false // 미읽은 알림 여부
+    @State private var isShowingReadPostsList = false // 읽은 게시물 목록 보기 상태
     
     // 인기 게시물 FetchRequest
     @FetchRequest(
@@ -167,6 +168,26 @@ struct HomeView: View {
                                     .frame(height: 32) // 버튼 높이 고정
                                 }
                                 .buttonStyle(BorderlessButtonStyle()) // 정렬 버튼 탭 영역 분리
+                                
+                                // 既読リスト 버튼 추가
+                                Button(action: {
+                                    isShowingReadPostsList.toggle()
+                                }) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "book.fill")
+                                            .foregroundColor(.gray)
+                                            .frame(width: 16, height: 16)
+                                        Text("既読")
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(15)
+                                    .frame(height: 32)
+                                }
+                                .buttonStyle(BorderlessButtonStyle())
                                 
                                 Spacer()
                             }
@@ -295,6 +316,10 @@ struct HomeView: View {
                     .onDisappear {
                         checkUnreadNotificationsStatus()
                     }
+            }
+            .sheet(isPresented: $isShowingReadPostsList) {
+                ReadPostsListView()
+                    .environment(\.managedObjectContext, viewContext)
             }
             .alert(isPresented: $showingAlert) {
                 Alert(

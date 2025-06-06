@@ -1,4 +1,4 @@
-import SwiftUI
+        import SwiftUI
 import CoreData
 
 struct PostDetailView: View {
@@ -318,30 +318,42 @@ struct PostDetailView: View {
     
     // ID로 게시물 로드하는 함수
     private func loadPost() {
-        print("⭐️ Loading post with ID: \(postId)")
         let fetchRequest: NSFetchRequest<Post> = Post.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "id == %@", postId as CVarArg)
         fetchRequest.fetchLimit = 1
         
         do {
             let results = try viewContext.fetch(fetchRequest)
-            if let foundPost = results.first {
-                print("✅ Successfully found post: \(foundPost.title ?? "No title") with ID: \(foundPost.id?.uuidString ?? "unknown")")
-                self.post = foundPost
-                self.likeCount = foundPost.likeCount
-                self.viewCount = foundPost.viewCount
-                loadVoteStatus()
+            if let loadedPost = results.first {
+                self.post = loadedPost
+                self.likeCount = loadedPost.likeCount
+                self.viewCount = loadedPost.viewCount
                 
-                if !hasIncreasedViewCount {
-                    increaseViewCount()
-                    hasIncreasedViewCount = true
+                // Check if the user has liked this post
+                // TODO: Implement user like status checking logic here
+                // self.isLiked = // check if current user has liked this post
+                
+                // Mark the post as read
+                if let postID = loadedPost.id, let title = loadedPost.title, let timestamp = loadedPost.timestamp {
+                    ReadPostsManager.shared.markAsRead(postID: postID, title: title, timestamp: timestamp)
                 }
-            } else {
-                print("❌ Could not find post with ID: \(postId)")
+                
+                // Increase view count if not already done
+                if !hasIncreasedViewCount {
+                    loadedPost.viewCount += 1
+                    hasIncreasedViewCount = true
+                    
+                    do {
+                        try viewContext.save()
+                        self.viewCount = loadedPost.viewCount
+                    } catch {
+                        print("Error increasing view count: \(error)")
+                    }
+                }
             }
             isLoading = false
         } catch {
-            print("❌ Error loading post: \(error)")
+            print("Error fetching post: \(error)")
             isLoading = false
         }
     }
