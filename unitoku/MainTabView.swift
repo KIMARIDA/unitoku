@@ -536,45 +536,6 @@ struct CourseFormView: View {
     }
 }
 
-// 時間割データを管理するViewModel
-class TimeTableViewModel: ObservableObject {
-    @Published var courses: [Course] = Course.samples
-    
-    // 特定の曜日のコースを取得
-    func coursesFor(weekday: Weekday) -> [Course] {
-        return courses.filter { $0.weekday == weekday }
-    }
-    
-    // 特定の曜日と時間帯のコースを取得
-    func courseFor(weekday: Weekday, period: Period) -> Course? {
-        return courses.first { $0.weekday == weekday && $0.period == period }
-    }
-    
-    // コースの追加
-    func addCourse(_ course: Course) {
-        courses.append(course)
-    }
-    
-    // コースの削除
-    func deleteCourse(_ course: Course) {
-        if let index = courses.firstIndex(where: { $0.id == course.id }) {
-            courses.remove(at: index)
-        }
-    }
-    
-    // コースの更新
-    func updateCourse(_ course: Course) {
-        if let index = courses.firstIndex(where: { $0.id == course.id }) {
-            courses[index] = course
-        }
-    }
-    
-    // ランダムな色を生成
-    func randomColor() -> Color {
-        Course.colors.randomElement() ?? .blue
-    }
-}
-
 // プレースホルダービュー - DetailedCourseReviewViewはCourseReviewView.swiftに実装済み
 
 #Preview {

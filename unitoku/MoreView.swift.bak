@@ -6,6 +6,7 @@ struct MoreView: View {
     @State private var showMyPosts = false
     @State private var showMyComments = false
     @State private var showBlockList = false
+    @State private var showAutoMatching = false
     @State private var showFAQ = false
     @State private var showEvents = false
     @State private var showLanguageSettings = false
@@ -17,9 +18,8 @@ struct MoreView: View {
     var body: some View {
         NavigationView {
             List {
-                // 모든 메뉴 항목을 단일 섹션으로 통합
+                // プロフィールセクション
                 Section {
-                    // 사용자 정보
                     HStack {
                         Image(systemName: profileIcon)
                             .resizable()
@@ -40,47 +40,57 @@ struct MoreView: View {
                     }
                     .padding(.vertical, 5)
                     
-                    // 로그아웃
                     SettingsRow(title: "ログアウト", iconName: "arrow.right.square", iconColor: .gray) {
                         // ログアウト処理
                     }
-                    
-                    // お気に入り掲示板
+                }
+                
+                // お気に入り・投稿関連
+                Section(header: SectionHeader(title: "投稿関連", iconName: "doc.text.fill")) {
                     SettingsRow(title: "お気に入り掲示板", iconName: "heart.fill", iconColor: .pink) {
                         showFavorites = true
                     }
                     
-                    // 自分の投稿履歴
                     SettingsRow(title: "自分の投稿履歴", iconName: "doc.text.fill", iconColor: .orange) {
                         showMyPosts = true
                     }
                     
-                    // コメント履歴
                     SettingsRow(title: "コメント履歴", iconName: "bubble.left.fill", iconColor: .green) {
                         showMyComments = true
                     }
-                    
-                    // ブラックリスト管理
+                }
+                
+                // 安全機能関連
+                Section(header: SectionHeader(title: "安全機能", iconName: "shield.fill")) {
                     SettingsRow(title: "ブラックリスト管理", iconName: "person.crop.circle.badge.xmark", iconColor: .red) {
                         showBlockList = true
                     }
                     
-                    // よくある質問
+                    SettingsRow(title: "オート一致わせ", iconName: "person.2.fill", iconColor: .blue) {
+                        showAutoMatching = true
+                    }
+                }
+                
+                // サポート・情報関連
+                Section(header: SectionHeader(title: "サポート", iconName: "questionmark.circle.fill")) {
                     SettingsRow(title: "よくある質問", iconName: "questionmark.circle.fill", iconColor: .purple) {
                         showFAQ = true
                     }
                     
-                    // イベント / キャンペーン情報
                     SettingsRow(title: "イベント / キャンペーン情報", iconName: "party.popper.fill", iconColor: .purple) {
                         showEvents = true
                     }
-                    
-                    // 言語設定
+                }
+                
+                // 言語設定
+                Section(header: SectionHeader(title: "設定", iconName: "gearshape.fill")) {
                     SettingsRow(title: "言語設定", iconName: "character.bubble", iconColor: .blue) {
                         showLanguageSettings = true
                     }
-                    
-                    // 버전 정보
+                }
+                
+                // アプリ情報
+                Section {
                     HStack {
                         Spacer()
                         VStack(spacing: 4) {
@@ -161,201 +171,6 @@ struct SectionHeader: View {
                 .font(.headline)
                 .foregroundColor(Color.appTheme)
         }
-    }
-}
-
-// プロフィール設定ビュー
-struct ProfileSettingsView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @State private var username = "匿名ユーザー"
-    @State private var selectedIcon = "person.circle.fill"
-    @State private var showIconPicker = false
-    
-    // アイコン選択肢
-    let iconOptions = [
-        "person.circle.fill",
-        "person.crop.circle.fill",
-        "face.smiling.fill",
-        "graduationcap.fill",
-        "book.fill",
-        "pencil.circle.fill",
-        "moonphase.new.moon.fill",
-        "star.fill",
-        "heart.fill",
-        "leaf.fill"
-    ]
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("プロフィール情報")) {
-                    HStack {
-                        Spacer()
-                        Button(action: { showIconPicker = true }) {
-                            Image(systemName: selectedIcon)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .foregroundColor(Color.appTheme)
-                                .padding(10)
-                                .background(Color.appTheme.opacity(0.2))
-                                .clipShape(Circle())
-                                .overlay(
-                                    Image(systemName: "pencil.circle.fill")
-                                        .foregroundColor(Color.appTheme)
-                                        .font(.system(size: 24))
-                                        .offset(x: 30, y: 30)
-                                )
-                        }
-                        Spacer()
-                    }
-                    .padding(.vertical, 10)
-                    
-                    TextField("ニックネーム", text: $username)
-                        .padding()
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(8)
-                }
-                
-                Section(footer: Text("ニックネームとアイコンのみ公開されます。個人情報は含めないでください。")) {
-                    Button(action: saveProfile) {
-                        Text("保存")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.appTheme)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                }
-            }
-            .navigationTitle("プロフィール設定")
-            .navigationBarItems(leading: Button("キャンセル") {
-                presentationMode.wrappedValue.dismiss()
-            })
-            .sheet(isPresented: $showIconPicker) {
-                IconPickerView(selectedIcon: $selectedIcon)
-            }
-        }
-    }
-    
-    func saveProfile() {
-        // プロフィール保存処理
-        // UserDefaults等に保存
-        UserDefaults.standard.set(username, forKey: "username")
-        UserDefaults.standard.set(selectedIcon, forKey: "profileIcon")
-        presentationMode.wrappedValue.dismiss()
-    }
-}
-
-// アイコン選択ビュー
-struct IconPickerView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @Binding var selectedIcon: String
-    
-    let iconOptions = [
-        "person.circle.fill",
-        "person.crop.circle.fill",
-        "face.smiling.fill",
-        "graduationcap.fill",
-        "book.fill",
-        "pencil.circle.fill",
-        "moonphase.new.moon.fill",
-        "star.fill",
-        "heart.fill",
-        "leaf.fill",
-        "globe.asia.australia.fill",
-        "music.note",
-        "swift",
-        "gamecontroller.fill",
-        "paintpalette.fill"
-    ]
-    
-    let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible()),
-        GridItem(.flexible()),
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
-    
-    var body: some View {
-        NavigationView {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(iconOptions, id: \.self) { icon in
-                        Button(action: {
-                            selectedIcon = icon
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            Image(systemName: icon)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 50, height: 50)
-                                .padding(10)
-                                .foregroundColor(selectedIcon == icon ? Color.white : Color.appTheme)
-                                .background(selectedIcon == icon ? Color.appTheme : Color.white)
-                                .clipShape(Circle())
-                                .shadow(color: Color.black.opacity(0.1), radius: 2)
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.appTheme, lineWidth: selectedIcon == icon ? 3 : 1)
-                                )
-                        }
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle("アイコンを選択")
-            .navigationBarItems(trailing: Button("キャンセル") {
-                presentationMode.wrappedValue.dismiss()
-            })
-        }
-    }
-}
-
-// 通知設定ビュー
-struct NotificationSettingsView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @State private var postNotifications = true
-    @State private var commentNotifications = true
-    @State private var likeNotifications = true
-    @State private var eventNotifications = true
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("通知設定")) {
-                    Toggle("新しい投稿", isOn: $postNotifications)
-                    Toggle("コメント", isOn: $commentNotifications)
-                    Toggle("いいね", isOn: $likeNotifications)
-                    Toggle("イベントとお知らせ", isOn: $eventNotifications)
-                }
-                
-                Section(footer: Text("通知設定はいつでも変更できます")) {
-                    Button(action: saveNotificationSettings) {
-                        Text("保存")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.appTheme)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                }
-            }
-            .navigationTitle("通知設定")
-            .navigationBarItems(leading: Button("キャンセル") {
-                presentationMode.wrappedValue.dismiss()
-            })
-        }
-    }
-    
-    func saveNotificationSettings() {
-        // 通知設定保存処理
-        UserDefaults.standard.set(postNotifications, forKey: "postNotifications")
-        UserDefaults.standard.set(commentNotifications, forKey: "commentNotifications")
-        UserDefaults.standard.set(likeNotifications, forKey: "likeNotifications")
-        UserDefaults.standard.set(eventNotifications, forKey: "eventNotifications")
-        presentationMode.wrappedValue.dismiss()
     }
 }
 
