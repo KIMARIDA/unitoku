@@ -235,7 +235,7 @@ struct SignUpView: View {
             })
             .alert(isPresented: $showingAlert) {
                 Alert(
-                    title: Text("エラー"),
+                    title: Text(alertMessage == "登録が完了しました。認証メールをご確認ください。" ? "通知" : "エラー"),
                     message: Text(alertMessage),
                     dismissButton: .default(Text("OK"))
                 )
