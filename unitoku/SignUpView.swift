@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct SignUpView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -14,6 +15,9 @@ struct SignUpView: View {
     @State private var alertMessage = ""
     @State private var selectedGrade = "1年生"
     @State private var currentStep = 0
+    @State private var isResending = false
+    @State private var resendAlert = false
+    @State private var resendMessage = ""
     
     private let grades = ["1年生", "2年生", "3年生", "4年生", "大学院生"]
     private let departments = ["情報理工学部", "経営学部", "国際関係学部", "文学部", "法学部", "産業社会学部", "映像学部", "スポーツ健康科学部", "生命科学部"]
@@ -214,7 +218,6 @@ struct SignUpView: View {
                 HStack {
                     Text("すでにアカウントをお持ちですか？")
                         .foregroundColor(.secondary)
-                    
                     Button("ログイン") {
                         presentationMode.wrappedValue.dismiss()
                     }
@@ -222,6 +225,19 @@ struct SignUpView: View {
                     .fontWeight(.bold)
                 }
                 .font(.subheadline)
+                .padding(.bottom, 8)
+                // メール再送信 버튼
+                Button(action: resendVerificationEmail) {
+                    if isResending {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                    } else {
+                        Text("認証メールを再送信")
+                            .font(.subheadline)
+                            .foregroundColor(Color.appTheme)
+                    }
+                }
+                .disabled(isResending)
                 .padding(.bottom, 20)
             }
             .navigationBarItems(leading: Button(action: {
@@ -237,6 +253,13 @@ struct SignUpView: View {
                 Alert(
                     title: Text(alertMessage == "登録が完了しました。認証メールをご確認ください。" ? "通知" : "エラー"),
                     message: Text(alertMessage),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
+            .alert(isPresented: $resendAlert) {
+                Alert(
+                    title: Text("通知"),
+                    message: Text(resendMessage),
                     dismissButton: .default(Text("OK"))
                 )
             }
@@ -331,6 +354,27 @@ struct SignUpView: View {
                 alertMessage = error.message
                 showingAlert = true
             }
+        }
+    }
+    
+    // メール再送信 기능
+    private func resendVerificationEmail() {
+        isResending = true
+        resendMessage = ""
+        guard let user = Auth.auth().currentUser else {
+            isResending = false
+            resendMessage = "再送信にはログインが必要です。"
+            resendAlert = true
+            return
+        }
+        user.sendEmailVerification { error in
+            isResending = false
+            if let error = error {
+                resendMessage = "メールの再送信に失敗しました: \(error.localizedDescription)"
+            } else {
+                resendMessage = "認証メールを再送信しました。メールをご確認ください。"
+            }
+            resendAlert = true
         }
     }
 }
