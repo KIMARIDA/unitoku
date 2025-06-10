@@ -129,21 +129,21 @@ struct LoginView: View {
             showingAlert = true
             return
         }
-        
         guard !password.isEmpty else {
             alertMessage = "パスワードを入力してください。"
             showingAlert = true
             return
         }
-        
-        // 로그인 처리 (현재는 더미 구현)
-        if email.contains("@") && password.count >= 6 {
-            // 로그인 성공
-            isLoggedIn = true
-        } else {
-            // 로그인 실패
-            alertMessage = "メールアドレスまたはパスワードが正しくありません。"
-            showingAlert = true
+        // 실제 Firebase 인증 사용
+        Task {
+            let result = await NetworkService.shared.login(email: email, password: password)
+            switch result {
+            case .success(_):
+                isLoggedIn = true
+            case .failure(let error):
+                alertMessage = error.message
+                showingAlert = true
+            }
         }
     }
 }

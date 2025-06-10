@@ -284,7 +284,7 @@ struct SignUpView: View {
     }
     
     private func signUp() {
-        // 최종 유효성 검사
+        // 最終バリデーション
         if !isFormValid {
             if name.isEmpty {
                 alertMessage = "名前を入力してください。"
@@ -301,14 +301,37 @@ struct SignUpView: View {
             } else if password != confirmPassword {
                 alertMessage = "パスワードが一致しません。"
             }
-            
             showingAlert = true
             return
         }
-        
-        // 실제 회원가입 로직은 여기에 구현
-        // 성공 시 로그인 화면으로 돌아가기
-        presentationMode.wrappedValue.dismiss()
+        // 実際の会員登録ロジック
+        Task {
+            let result = await NetworkService.shared.signUp(
+                name: name,
+                email: email,
+                password: password,
+                studentID: studentID,
+                department: department,
+                grade: selectedGrade
+            )
+            switch result {
+            case .success(_):
+                alertMessage = "登録が完了しました。認証メールをご確認ください。"
+                showingAlert = true
+                // 会員登録成功後、入力値を初期化し最初のステップに戻す
+                name = ""
+                email = ""
+                password = ""
+                confirmPassword = ""
+                studentID = ""
+                department = ""
+                selectedGrade = "1年生"
+                currentStep = 0
+            case .failure(let error):
+                alertMessage = error.message
+                showingAlert = true
+            }
+        }
     }
 }
 

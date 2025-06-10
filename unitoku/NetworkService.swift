@@ -15,21 +15,21 @@ enum NetworkError: Error {
     var message: String {
         switch self {
         case .invalidURL:
-            return "유효하지 않은 URL입니다."
+            return "無効なURLです。"
         case .invalidResponse:
-            return "서버 응답이 유효하지 않습니다."
+            return "サーバーの応答が無効です。"
         case .invalidData:
-            return "데이터가 유효하지 않습니다."
+            return "データが無効です。"
         case .requestFailed(let error):
-            return "요청 실패: \(error.localizedDescription)"
+            return "リクエスト失敗: \(error.localizedDescription)"
         case .serverError(let code):
-            return "서버 오류 (코드: \(code))"
+            return "サーバーエラー (コード: \(code))"
         case .decodingError(let error):
-            return "데이터 디코딩 오류: \(error.localizedDescription)"
+            return "データのデコードエラー: \(error.localizedDescription)"
         case .authError(let message):
-            return "인증 오류: \(message)"
+            return message
         case .unknownError:
-            return "알 수 없는 오류가 발생했습니다."
+            return "不明なエラーが発生しました。"
         }
     }
 }
@@ -43,7 +43,7 @@ struct UserProfile: Codable {
     let grade: String?
 }
 
-// 회원가입 요청을 위한 모델 추가
+// 会員登録リクエストのためのモデル追加
 struct SignUpRequest: Codable {
     let name: String
     let email: String
@@ -58,24 +58,24 @@ class NetworkService {
     
     private let db = Firestore.firestore()
     
-    // 로그인 메서드
+    // ログインメソッド
     func login(email: String, password: String) async -> Result<UserProfile, NetworkError> {
         do {
-            // Firebase Auth로 로그인
+            // Firebase Authでログイン
             let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
             let user = authResult.user
             
-            // Firestore에서 사용자 정보 가져오기
+            // Firestoreからユーザー情報を取得
             let userDoc = try await db.collection("users").document(user.uid).getDocument()
             
             guard let userData = userDoc.data() else {
                 return .failure(.invalidData)
             }
             
-            // UserDefaults에 사용자 ID 저장
+            // UserDefaultsにユーザーIDを保存
             UserDefaults.standard.set(user.uid, forKey: "currentUserId")
             
-            // 사용자 프로필 객체 생성
+            // ユーザープロフィールオブジェクトを作成
             let userProfile = UserProfile(
                 id: user.uid,
                 name: userData["name"] as? String ?? "",
@@ -87,21 +87,21 @@ class NetworkService {
             
             return .success(userProfile)
         } catch {
-            // 에러 처리
+            // エラー処理
             let errorMessage: String
             let nsError = error as NSError
-            // Firebase AuthErrorCode는 .Code(rawValue:)가 아니라 rawValue로 직접 비교해야 함
+            // Firebase AuthErrorCodeは.Code(rawValue:)ではなくrawValueで直接比較する必要がある
             switch nsError.code {
             case AuthErrorCode.wrongPassword.rawValue:
-                errorMessage = "비밀번호가 올바르지 않습니다."
+                errorMessage = "パスワードが正しくありません。"
             case AuthErrorCode.userNotFound.rawValue:
-                errorMessage = "해당 이메일의 사용자를 찾을 수 없습니다."
+                errorMessage = "該当するメールアドレスのユーザーが見つかりません。"
             case AuthErrorCode.invalidEmail.rawValue:
-                errorMessage = "이메일 형식이 올바르지 않습니다."
+                errorMessage = "メールアドレスの形式が正しくありません。"
             case AuthErrorCode.userDisabled.rawValue:
-                errorMessage = "이 계정은 비활성화되었습니다."
+                errorMessage = "このアカウントは無効化されています。"
             case AuthErrorCode.tooManyRequests.rawValue:
-                errorMessage = "너무 많은 요청이 발생했습니다. 나중에 다시 시도해주세요."
+                errorMessage = "リクエストが多すぎます。しばらくしてから再度お試しください。"
             default:
                 errorMessage = error.localizedDescription
             }
@@ -109,14 +109,15 @@ class NetworkService {
         }
     }
     
-    // 회원가입 메서드
+    // 会員登録メソッド
     func signUp(name: String, email: String, password: String, studentID: String, department: String, grade: String) async -> Result<UserProfile, NetworkError> {
         do {
-            // Firebase Auth로 사용자 생성
+            // Firebase Authでユーザー作成
             let authResult = try await Auth.auth().createUser(withEmail: email, password: password)
             let user = authResult.user
-            
-            // Firestore에 사용자 추가 정보 저장
+            // メールアドレス認証メール送信
+            try await user.sendEmailVerification()
+            // Firestoreにユーザー追加情報保存
             let userData: [String: Any] = [
                 "name": name,
                 "email": email,
@@ -125,13 +126,10 @@ class NetworkService {
                 "grade": grade,
                 "createdAt": FieldValue.serverTimestamp()
             ]
-            
             try await db.collection("users").document(user.uid).setData(userData)
-            
-            // UserDefaults에 사용자 ID 저장
+            // UserDefaultsにユーザーIDを保存
             UserDefaults.standard.set(user.uid, forKey: "currentUserId")
-            
-            // 사용자 프로필 객체 생성
+            // ユーザープロフィールオブジェクトを作成
             let userProfile = UserProfile(
                 id: user.uid,
                 name: name,
@@ -140,19 +138,18 @@ class NetworkService {
                 department: department,
                 grade: grade
             )
-            
             return .success(userProfile)
         } catch {
-            // 에러 처리
+            // エラー処理
             let errorMessage: String
             let nsError = error as NSError
             switch nsError.code {
             case AuthErrorCode.emailAlreadyInUse.rawValue:
-                errorMessage = "이미 사용 중인 이메일 주소입니다."
+                errorMessage = "すでに使用されているメールアドレスです。"
             case AuthErrorCode.invalidEmail.rawValue:
-                errorMessage = "이메일 형식이 올바르지 않습니다."
+                errorMessage = "メールアドレスの形式が正しくありません。"
             case AuthErrorCode.weakPassword.rawValue:
-                errorMessage = "비밀번호가 너무 약합니다."
+                errorMessage = "パスワードが弱すぎます。"
             default:
                 errorMessage = error.localizedDescription
             }
@@ -160,7 +157,7 @@ class NetworkService {
         }
     }
     
-    // 로그아웃 메서드
+    // ログアウトメソッド
     func logout() -> Result<Void, NetworkError> {
         do {
             try Auth.auth().signOut()
@@ -171,15 +168,15 @@ class NetworkService {
         }
     }
     
-    // 현재 로그인 상태 확인
+    // 現在のログイン状態を確認
     var isLoggedIn: Bool {
         return Auth.auth().currentUser != nil
     }
     
-    // 현재 사용자 정보 가져오기
+    // 現在のユーザー情報を取得
     func getCurrentUser() async -> Result<UserProfile, NetworkError> {
         guard let user = Auth.auth().currentUser else {
-            return .failure(.authError("로그인된 사용자가 없습니다."))
+            return .failure(.authError("ログインされたユーザーがいません。"))
         }
         
         do {
@@ -189,7 +186,7 @@ class NetworkService {
                 return .failure(.invalidData)
             }
             
-            // 사용자 프로필 객체 생성
+            // ユーザープロフィールオブジェクトを作成
             let userProfile = UserProfile(
                 id: user.uid,
                 name: userData["name"] as? String ?? "",
