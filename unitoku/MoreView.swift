@@ -115,7 +115,7 @@ struct MoreView: View {
                 }
             }
             .listStyle(InsetGroupedListStyle())
-            .navigationTitle("設定")
+            .navigationTitle("もっと")
             
             // シートとナビゲーションリンク
             .sheet(isPresented: $showProfileSettings) {
