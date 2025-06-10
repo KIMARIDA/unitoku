@@ -8,7 +8,7 @@ struct BubbleSpinnerView: View {
     @State private var rotation: Double = 0
     @State private var bubbleScale: [CGFloat]
     
-    init(themeColor: Color = Color.appTheme, isRefreshing: Bool = false, bubbleCount: Int = 5) {
+    init(themeColor: Color = Color(hex: "fd72ae"), isRefreshing: Bool = false, bubbleCount: Int = 5) {
         self.themeColor = themeColor
         self.isRefreshing = isRefreshing
         self.bubbleCount = bubbleCount
@@ -137,14 +137,16 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
     }
 }
 
-#Preview {
-    RefreshableScrollView(themeColor: Color.appTheme, onRefresh: {
-        try? await Task.sleep(nanoseconds: 2_000_000_000)
-    }) {
-        VStack {
-            ForEach(0..<10, id: \.self) { i in
-                Text("Item \(i)")
-                    .padding()
+struct CustomRefreshView_Previews: PreviewProvider {
+    static var previews: some View {
+        RefreshableScrollView(themeColor: Color.red, onRefresh: {
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+        }) {
+            VStack {
+                ForEach(0..<10, id: \.self) { i in
+                    Text("Item \(i)")
+                        .padding()
+                }
             }
         }
     }

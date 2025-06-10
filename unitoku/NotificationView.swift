@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreData
+import Foundation
 
 struct NotificationItem: Identifiable {
     var id = UUID()
@@ -45,7 +46,7 @@ struct NotificationView: View {
                     List {
                         ForEach(notifications) { notification in
                             NotificationRow(notification: notification)
-                                .background(notification.isRead ? Color.clear : Color(hex: "e6f7ff").opacity(0.4))
+                                .background(notification.isRead ? Color.clear : Color.blue.opacity(0.1))
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     markAsRead(notification: notification)
@@ -202,7 +203,7 @@ struct NotificationRow: View {
         }
         .padding(.vertical, 8)
         .listRowSeparator(.hidden)
-        .listRowBackground(notification.isRead ? Color.clear : Color(hex: "e6f7ff").opacity(0.3))
+        .listRowBackground(notification.isRead ? Color.clear : Color.blue.opacity(0.1))
     }
     
     var notificationIcon: some View {
@@ -223,13 +224,13 @@ struct NotificationRow: View {
     var iconColor: Color {
         switch notification.type {
         case .like:
-            return Color.appTheme
+            return .red
         case .comment:
-            return Color.appTheme
+            return .blue
         case .system:
-            return Color.gray
+            return .gray
         case .mention:
-            return Color(hex: "5856D6")
+            return .purple
         }
     }
 }

@@ -1,5 +1,8 @@
 import SwiftUI
 import CoreData
+import Foundation
+import UIKit
+// CoreDataModels의 타입 별칭을 사용합니다
 
 // UserDefaults에 이미지 데이터를 저장하기 위한 키 생성 함수
 private func imageStorageKey(for postID: UUID) -> String {
@@ -7,7 +10,7 @@ private func imageStorageKey(for postID: UUID) -> String {
 }
 
 // Post 클래스 확장
-extension Post {
+extension CDPost {
     var imageData: [Data] {
         get {
             guard let id = self.id else { return [] }
