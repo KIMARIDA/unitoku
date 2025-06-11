@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 
 // Extension to add authorId property to Post
-extension CDPost {
+extension Post {
     // Since we can't directly add properties to CoreData entities at runtime,
     // we'll store the authorId in UserDefaults with a post-specific key
     var authorId: String {

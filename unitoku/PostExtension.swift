@@ -10,7 +10,7 @@ private func imageStorageKey(for postID: UUID) -> String {
 }
 
 // Post 클래스 확장
-extension CDPost {
+extension Post {
     var imageData: [Data] {
         get {
             guard let id = self.id else { return [] }

@@ -35,7 +35,7 @@ class DummyComment: NSManagedObject, Identifiable {
 
 // 더미 포스트 상세 뷰 (이름 변경)
 struct DummyPostDetailView: View {
-    var post: CDPost
+    var post: Post
     
     var body: some View {
         Text("포스트 상세 페이지: \(post.title ?? "제목 없음")")
