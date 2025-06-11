@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct LoginView: View {
     @State private var email = ""
@@ -8,6 +9,7 @@ struct LoginView: View {
     @State private var showingAlert = false
     @State private var alertMessage = ""
     @State private var isLoggedIn = false
+    @State private var isShowingResetPassword = false
     
     var body: some View {
         NavigationStack {
@@ -65,11 +67,14 @@ struct LoginView: View {
                     HStack {
                         Spacer()
                         
-                        Button("パスワードをお忘れですか？") {
-                            // 비밀번호 찾기 로직
+                        Button {
+                            print("비밀번호 찾기 버튼 클릭됨")
+                            isShowingResetPassword = true
+                        } label: {
+                            Text("パスワードをお忘れですか？")
+                                .font(.footnote)
+                                .foregroundColor(Color.appTheme)
                         }
-                        .font(.footnote)
-                        .foregroundColor(Color.appTheme)
                     }
                     .padding(.bottom, 20)
                     
@@ -111,6 +116,9 @@ struct LoginView: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $isShowingSignUp) {
                 SignUpView()
+            }
+            .sheet(isPresented: $isShowingResetPassword) {
+                ResetPasswordView()
             }
             .alert(isPresented: $showingAlert) {
                 Alert(
