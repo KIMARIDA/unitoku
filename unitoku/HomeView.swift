@@ -1,6 +1,7 @@
 import SwiftUI
 import CoreData
 import Foundation
+import Firebase
 
 // 새로고침 관련 코드 삭제 (CustomRefreshViewHome, InlineRefreshableScrollView 제거)
 
@@ -336,6 +337,9 @@ struct HomeView: View {
                 
                 // 미읽은 알림 상태 확인
                 checkUnreadNotificationsStatus()
+                
+                // Firebase에서 게시물 가져오기
+                fetchPosts()
             }
         }
     }
@@ -394,6 +398,20 @@ struct HomeView: View {
         // 실제 앱에서는 서버나 데이터베이스와 연동하여 확인해야 함
         hasUnreadNotifications = UserDefaults.standard.bool(forKey: "hasUnreadNotifications")
         print("미읽은 알림 상태 확인: \(hasUnreadNotifications)")
+    }
+    
+    // Firebase에서 게시물 가져오기
+    func fetchPosts() {
+        let db = Firestore.firestore()
+        db.collection("posts").getDocuments { (snapshot, error) in
+            if let error = error {
+                print("Error fetching posts: \(error)")
+                return
+            }
+            guard let documents = snapshot?.documents else { return }
+            // Parse documents into your Post model as needed
+            print("Fetched \(documents.count) posts from Firebase")
+        }
     }
 }
 

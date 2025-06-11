@@ -1,6 +1,7 @@
 import SwiftUI
 import CoreData
 import PhotosUI
+import Firebase
 
 struct NewPostView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -356,6 +357,24 @@ struct NewPostView: View {
             } catch {
                 let nsError = error as NSError
                 print("Error creating new post: \(nsError), \(nsError.userInfo)")
+            }
+        }
+    }
+    
+    func createPosts(title: String, content: String, category: String, authorId: String) {
+        let db = Firestore.firestore()
+        let postData: [String: Any] = [
+            "title": title,
+            "content": content,
+            "category": category,
+            "authorId": authorId,
+            "timestamp": Timestamp(date: Date())
+        ]
+        db.collection("posts").addDocument(data: postData) { error in
+            if let error = error {
+                print("Error creating post: \(error)")
+            } else {
+                print("Post successfully created in Firebase")
             }
         }
     }
