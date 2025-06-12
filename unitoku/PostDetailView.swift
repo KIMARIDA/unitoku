@@ -48,12 +48,16 @@ struct PostDetailView: View {
     // 현재 사용자가 포스트 작성자인지 확인
     private var isAuthor: Bool {
         guard let post = post else { return false }
+        
+        let postAuthorId = post.authorId
+        let isCurrentUserAuthor = postAuthorId != nil && !postAuthorId!.isEmpty && postAuthorId == currentUserId
+        
         // For debugging
         print("Current User ID: \(currentUserId)")
-        print("Post Author ID: \(post.authorId)")
+        print("Post Author ID: \(postAuthorId ?? "nil")")
+        print("Is Author: \(isCurrentUserAuthor)")
         
-        // Since we're using the author extension, let's always show the edit button for testing
-        return true // Always return true for now to test if the button appears
+        return isCurrentUserAuthor
     }
     
     var commentsArray: [Comment] {
@@ -378,9 +382,9 @@ struct PostDetailView: View {
             post.likeCount += 1
             try? viewContext.save()
             // Firestore 알림 전송: 게시글 작성자에게
-            if post.authorId != "" && post.authorId != currentUserId, let postId = post.id {
+            if let authorId = post.authorId, !authorId.isEmpty, authorId != currentUserId, let postId = post.id {
                 sendNotificationToUser(
-                    userId: post.authorId,
+                    userId: authorId,
                     type: "like",
                     title: "いいね",
                     message: "あなたの投稿がいいねされました。",
@@ -479,6 +483,7 @@ struct PostDetailView: View {
             newComment.id = UUID()
             newComment.content = commentText
             newComment.timestamp = Date()
+            newComment.authorId = currentUserId  // Set comment author ID
             newComment.post = post
             
             // 이 게시물에 댓글을 달았다는 정보를 UserDefaults에 저장
@@ -488,9 +493,9 @@ struct PostDetailView: View {
             }
             
             // Firestore 알림 전송: 게시글 작성자에게
-            if post.authorId != "" && post.authorId != currentUserId, let postId = post.id {
+            if let authorId = post.authorId, !authorId.isEmpty, authorId != currentUserId, let postId = post.id {
                 sendNotificationToUser(
-                    userId: post.authorId,
+                    userId: authorId,
                     type: "comment",
                     title: "新しいコメント",
                     message: "あなたの投稿に新しいコメントがあります。",

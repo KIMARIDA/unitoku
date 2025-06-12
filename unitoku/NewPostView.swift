@@ -340,7 +340,7 @@ struct NewPostView: View {
             newPost.isAnonymous = isAnonymous
             newPost.category = selectedCategory
             
-            // Set the author ID for the post
+            // Set the author ID for the post using CoreData's native authorId property
             let currentUserId = UserDefaults.standard.string(forKey: "currentUserId") ?? "user_1"
             newPost.authorId = currentUserId
             

@@ -54,5 +54,43 @@ struct PersistenceController {
             }
         })
         container.viewContext.automaticallyMergesChangesFromParent = true
+        
+        // Migrate existing posts to use CoreData authorId field
+        migrateAuthorIds()
+    }
+    
+    // Migrate existing posts from UserDefaults-based authorId to CoreData authorId
+    private func migrateAuthorIds() {
+        let context = container.viewContext
+        let fetchRequest: NSFetchRequest<Post> = Post.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "authorId == nil OR authorId == ''")
+        
+        do {
+            let postsToMigrate = try context.fetch(fetchRequest)
+            let currentUserId = UserDefaults.standard.string(forKey: "currentUserId") ?? "user_1"
+            
+            for post in postsToMigrate {
+                // Try to get authorId from UserDefaults first
+                if let postId = post.id?.uuidString {
+                    let userDefaultsAuthorId = UserDefaults.standard.string(forKey: "post_author_\(postId)")
+                    post.authorId = userDefaultsAuthorId ?? currentUserId
+                    
+                    // Clean up UserDefaults entry
+                    if userDefaultsAuthorId != nil {
+                        UserDefaults.standard.removeObject(forKey: "post_author_\(postId)")
+                    }
+                } else {
+                    // Fallback to current user
+                    post.authorId = currentUserId
+                }
+            }
+            
+            if !postsToMigrate.isEmpty {
+                try context.save()
+                print("✅ Migrated \(postsToMigrate.count) posts to use CoreData authorId")
+            }
+        } catch {
+            print("❌ Error migrating authorIds: \(error)")
+        }
     }
 }
