@@ -337,9 +337,6 @@ struct HomeView: View {
                 
                 // 미읽은 알림 상태 확인
                 checkUnreadNotificationsStatus()
-                
-                // Firebase에서 게시물 가져오기
-                fetchPosts()
             }
         }
     }
@@ -400,17 +397,16 @@ struct HomeView: View {
         print("미읽은 알림 상태 확인: \(hasUnreadNotifications)")
     }
     
-    // Firebase에서 게시물 가져오기
-    func fetchPosts() {
+    // Firestore에서 게시글을 불러오는 함수
+    func fetchposts(completion: @escaping ([QueryDocumentSnapshot]?) -> Void) {
         let db = Firestore.firestore()
         db.collection("posts").getDocuments { (snapshot, error) in
             if let error = error {
                 print("Error fetching posts: \(error)")
+                completion(nil)
                 return
             }
-            guard let documents = snapshot?.documents else { return }
-            // Parse documents into your Post model as needed
-            print("Fetched \(documents.count) posts from Firebase")
+            completion(snapshot?.documents)
         }
     }
 }

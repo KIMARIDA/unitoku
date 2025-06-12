@@ -123,7 +123,7 @@ struct ChatDetailView: View {
                     }
                     .padding(.horizontal)
                     .padding(.top, 10)
-                    .onChange(of: viewModel.messages[room.id]?.count ?? 0) { _, _ in
+                    .onChange(of: viewModel.messages[room.id]?.count ?? 0) { _ in
                         if let messages = viewModel.messages[room.id], let lastMessage = messages.last {
                             withAnimation {
                                 scrollView.scrollTo(lastMessage.id, anchor: .bottom)

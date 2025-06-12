@@ -378,9 +378,9 @@ struct PostDetailView: View {
             post.likeCount += 1
             try? viewContext.save()
             // Firestore 알림 전송: 게시글 작성자에게
-            if post.authorId != "" && post.authorId != currentUserId, let postId = post.id {
+            if let authorId = post.authorId, authorId != currentUserId, let postId = post.id {
                 sendNotificationToUser(
-                    userId: post.authorId,
+                    userId: authorId,
                     type: "like",
                     title: "いいね",
                     message: "あなたの投稿がいいねされました。",
@@ -488,9 +488,9 @@ struct PostDetailView: View {
             }
             
             // Firestore 알림 전송: 게시글 작성자에게
-            if post.authorId != "" && post.authorId != currentUserId, let postId = post.id {
+            if let authorId = post.authorId, authorId != currentUserId, let postId = post.id {
                 sendNotificationToUser(
-                    userId: post.authorId,
+                    userId: authorId,
                     type: "comment",
                     title: "新しいコメント",
                     message: "あなたの投稿に新しいコメントがあります。",
@@ -543,26 +543,26 @@ extension PostDetailView {
             }
         }
     }
-}
-
-// Firestore 알림 전송 함수
-func sendNotificationToUser(userId: String, type: String, title: String, message: String, relatedPostId: UUID) {
-    let db = Firestore.firestore()
-    let notificationData: [String: Any] = [
-        "userId": userId,
-        "type": type,
-        "title": title,
-        "message": message,
-        "postId": relatedPostId.uuidString,
-        "isRead": false,
-        "timestamp": FieldValue.serverTimestamp()
-    ]
     
-    db.collection("notifications").addDocument(data: notificationData) { error in
-        if let error = error {
-            print("Error sending notification: \(error)")
-        } else {
-            print("Notification sent successfully")
+    // Firestore 알림 전송 함수
+    func sendNotificationToUser(userId: String, type: String, title: String, message: String, relatedPostId: UUID) {
+        let db = Firestore.firestore()
+        let notificationData: [String: Any] = [
+            "userId": userId,
+            "type": type,
+            "title": title,
+            "message": message,
+            "postId": relatedPostId.uuidString,
+            "isRead": false,
+            "timestamp": FieldValue.serverTimestamp()
+        ]
+        
+        db.collection("notifications").addDocument(data: notificationData) { error in
+            if let error = error {
+                print("Error sending notification: \(error)")
+            } else {
+                print("Notification sent successfully")
+            }
         }
     }
 }
@@ -756,7 +756,7 @@ struct PostEditView: View {
                 Section(header: Text("タイトル")) {
                     VStack(alignment: .leading, spacing: 5) {
                         TextField("タイトルを入力", text: $title)
-                            .onChange(of: title) { oldValue, newValue in
+                            .onChange(of: title) { newValue in
                                 let maxLength = isEnglishText ? maxTitleLengthEnglish : maxTitleLengthNonEnglish
                                 
                                 if newValue.count > maxLength {

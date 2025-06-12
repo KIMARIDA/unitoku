@@ -360,8 +360,10 @@ struct NewPostView: View {
             }
         }
     }
-    
-    func createPosts(title: String, content: String, category: String, authorId: String) {
+}
+
+extension NewPostView {
+    func createposts(title: String, content: String, category: String, authorId: String, completion: @escaping (Bool) -> Void) {
         let db = Firestore.firestore()
         let postData: [String: Any] = [
             "title": title,
@@ -373,8 +375,10 @@ struct NewPostView: View {
         db.collection("posts").addDocument(data: postData) { error in
             if let error = error {
                 print("Error creating post: \(error)")
+                completion(false)
             } else {
                 print("Post successfully created in Firebase")
+                completion(true)
             }
         }
     }

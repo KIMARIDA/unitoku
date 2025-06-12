@@ -1,6 +1,10 @@
 import SwiftUI
 import CoreData
 import Foundation
+import Firebase
+import FirebaseCore
+import FirebaseFirestore
+import FirebaseAuth
 
 struct NotificationItem: Identifiable {
     var id = UUID()
@@ -25,6 +29,7 @@ struct NotificationView: View {
     @State private var notifications: [NotificationItem] = []
     @State private var isLoading = true
     @State private var hasUnreadNotifications = false
+    @State private var firestoreListener: ListenerRegistration?
     
     var body: some View {
         NavigationView {
@@ -80,6 +85,10 @@ struct NotificationView: View {
                 Task {
                     await loadNotifications()
                 }
+                listenToFirestoreNotifications()
+            }
+            .onDisappear {
+                firestoreListener?.remove()
             }
         }
     }
@@ -170,6 +179,41 @@ struct NotificationView: View {
             )
             dismiss()
         }
+    }
+    
+    private func listenToFirestoreNotifications() {
+        // Firebase Auth가 제대로 로드되지 않는 문제가 있어, UserDefaults에서 현재 사용자 ID를 가져옵니다
+        // 실제 환경에서는 아래 주석 처리된 코드를 사용해야 합니다
+        //guard let userId = Auth.auth().currentUser?.uid else { return }
+        let userId = UserDefaults.standard.string(forKey: "currentUserId") ?? "user_1"
+        
+        let db = Firestore.firestore()
+        firestoreListener = db.collection("notifications")
+            .whereField("userId", isEqualTo: userId)
+            .order(by: "timestamp", descending: true)
+            .addSnapshotListener { snapshot, error in
+                guard let documents = snapshot?.documents else { return }
+                let items: [NotificationItem] = documents.compactMap { doc in
+                    let data = doc.data()
+                    guard let title = data["title"] as? String,
+                          let message = data["message"] as? String,
+                          let timestamp = (data["timestamp"] as? Timestamp)?.dateValue(),
+                          let isRead = data["isRead"] as? Bool,
+                          let typeString = data["type"] as? String else { return nil }
+                    let type: NotificationItem.NotificationType
+                    switch typeString {
+                    case "like": type = .like
+                    case "comment": type = .comment
+                    case "mention": type = .mention
+                    default: type = .system
+                    }
+                    let relatedPostId = (data["relatedPostId"] as? String).flatMap { UUID(uuidString: $0) }
+                    return NotificationItem(title: title, message: message, timestamp: timestamp, isRead: isRead, type: type, relatedPostId: relatedPostId)
+                }
+                notifications = items
+                hasUnreadNotifications = items.contains { !$0.isRead }
+                isLoading = false
+            }
     }
 }
 
