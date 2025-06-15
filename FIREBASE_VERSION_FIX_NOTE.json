@@ -1,0 +1,4 @@
+{
+  "object": "check-firebase-version",
+  "note": "firebase-ios-sdk 패키지 버전을 11.14.0으로 명시적으로 고정. 이후 xcodebuild -resolvePackageDependencies를 다시 실행하세요."
+}

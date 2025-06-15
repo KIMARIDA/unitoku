@@ -273,6 +273,10 @@ struct HomeView: View {
             }
             .navigationTitle("立命館大学")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    SyncStatusView()
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 16) {
                         // 알림 버튼 - 미읽은 알림이 있는 경우 뱃지 표시
@@ -399,7 +403,7 @@ struct HomeView: View {
     
     // Firestore에서 게시글을 불러오는 함수
     func fetchposts(completion: @escaping ([QueryDocumentSnapshot]?) -> Void) {
-        let db = Firestore.firestore()
+        let db = FirebaseManager.shared.getFirestore()
         db.collection("posts").getDocuments { (snapshot, error) in
             if let error = error {
                 print("Error fetching posts: \(error)")

@@ -12,11 +12,12 @@ import FirebaseCrashlytics
 @main
 struct unitokuApp: App {
     let persistenceController = PersistenceController.shared
-    
+    let syncManager: SyncManager
+
     init() {
         // Firebase 초기화
         FirebaseApp.configure()
-        
+
         // Firebase Crashlytics 초기화
         #if DEBUG
         Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
@@ -25,14 +26,20 @@ struct unitokuApp: App {
         Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(true)
         print("✅ Crashlytics enabled for Release builds")
         #endif
-        
-        // Firebase 연결 테스트
-        let db = Firestore.firestore()
-        db.collection("connection_test").addDocument(data: ["timestamp": Date()]) { error in
-            if let error = error {
-                print("🔥 Firestore 연결 실패: \(error.localizedDescription)")
-            } else {
-                print("✅ Firestore 연결 성공!")
+
+        // 반드시 Firebase 초기화 이후에 싱크 매니저 생성
+        self.syncManager = SyncManager.shared
+
+        // Firestore 연결 테스트
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            let db = FirebaseManager.shared.getFirestore()
+            db.collection("connection_test").addDocument(data: ["timestamp": Date()]) { error in
+                if let error = error {
+                    print("🔥 Firestore 연결 실패: \(error.localizedDescription)")
+                } else {
+                    print("✅ Firestore 연결 성공!")
+                    print("🔄 Real-time sync started")
+                }
             }
         }
     }
@@ -41,6 +48,7 @@ struct unitokuApp: App {
         WindowGroup {
             LoginView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(syncManager)
         }
     }
 }

@@ -354,6 +354,16 @@ struct NewPostView: View {
             
             do {
                 try viewContext.save()
+                
+                // Sync to Firebase
+                Task {
+                    do {
+                        try await SyncManager.shared.syncPost(newPost)
+                        print("✅ Post synced to Firebase successfully")
+                    } catch {
+                        print("❌ Failed to sync post to Firebase: \(error)")
+                    }
+                }
             } catch {
                 let nsError = error as NSError
                 print("Error creating new post: \(nsError), \(nsError.userInfo)")
@@ -364,7 +374,7 @@ struct NewPostView: View {
 
 extension NewPostView {
     func createposts(title: String, content: String, category: String, authorId: String, completion: @escaping (Bool) -> Void) {
-        let db = Firestore.firestore()
+        let db = FirebaseManager.shared.getFirestore()
         let postData: [String: Any] = [
             "title": title,
             "content": content,

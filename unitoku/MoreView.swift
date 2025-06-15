@@ -11,6 +11,7 @@ struct MoreView: View {
     @State private var showLanguageSettings = false
     @State private var showProfileSettings = false
     @State private var showNotificationSettings = false
+    @State private var showSyncSettings = false
     @State private var showLogoutAlert = false
     
     // User data from UserDefaults
@@ -95,6 +96,11 @@ struct MoreView: View {
                         showNotificationSettings = true
                     }
                     
+                    // データ同期設定
+                    SettingsRow(title: "データ同期", iconName: "arrow.clockwise.icloud", iconColor: .green) {
+                        showSyncSettings = true
+                    }
+                    
                     // 버전 정보
                     HStack {
                         Spacer()
@@ -144,6 +150,9 @@ struct MoreView: View {
             }
             .sheet(isPresented: $showNotificationSettings) {
                 NotificationSettingsView()
+            }
+            .sheet(isPresented: $showSyncSettings) {
+                SyncSettingsView()
             }
             .alert(isPresented: $showLogoutAlert) {
                 Alert(

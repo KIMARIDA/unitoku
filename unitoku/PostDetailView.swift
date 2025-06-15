@@ -507,6 +507,16 @@ struct PostDetailView: View {
             showingCommentField = false
             
             saveContext()
+            
+            // Sync comment to Firebase
+            Task {
+                do {
+                    try await SyncManager.shared.syncComment(newComment)
+                    print("✅ Comment synced to Firebase successfully")
+                } catch {
+                    print("❌ Failed to sync comment to Firebase: \(error)")
+                }
+            }
         }
     }
     
@@ -537,7 +547,7 @@ struct PostDetailView: View {
 
 extension PostDetailView {
     func deletePosts(postId: String, completion: @escaping (Bool) -> Void) {
-        let db = Firestore.firestore()
+        let db = FirebaseManager.shared.getFirestore()
         db.collection("posts").document(postId).delete { error in
             if let error = error {
                 print("Error deleting post: \(error)")
@@ -552,7 +562,7 @@ extension PostDetailView {
 
 // Firestore 알림 전송 함수
 func sendNotificationToUser(userId: String, type: String, title: String, message: String, relatedPostId: UUID) {
-    let db = Firestore.firestore()
+    let db = FirebaseManager.shared.getFirestore()
     let notificationData: [String: Any] = [
         "userId": userId,
         "type": type,

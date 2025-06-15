@@ -187,7 +187,7 @@ struct NotificationView: View {
         //guard let userId = Auth.auth().currentUser?.uid else { return }
         let userId = UserDefaults.standard.string(forKey: "currentUserId") ?? "user_1"
         
-        let db = Firestore.firestore()
+        let db = FirebaseManager.shared.getFirestore()
         firestoreListener = db.collection("notifications")
             .whereField("userId", isEqualTo: userId)
             .order(by: "timestamp", descending: true)

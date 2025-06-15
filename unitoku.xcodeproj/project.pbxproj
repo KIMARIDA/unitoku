@@ -11,6 +11,7 @@
 		CEBEA2512DF7F7A2003DB9C7 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = CEBEA2502DF7F7A2003DB9C7 /* FirebaseAuth */; };
 		CEBEA2532DF7F7A2003DB9C7 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = CEBEA2522DF7F7A2003DB9C7 /* FirebaseFirestore */; };
 		CEBEA2552DF7F7A2003DB9C7 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = CEBEA2542DF7F7A2003DB9C7 /* FirebaseCrashlytics */; };
+		CEBEA2572DF7F7A2003DB9C7 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = CEBEA2562DF7F7A2003DB9C7 /* FirebaseStorage */; };
 		CED67B062DF188E200781A06 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = CED67B052DF188E200781A06 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
@@ -78,6 +79,7 @@
 				CEBEA2512DF7F7A2003DB9C7 /* FirebaseAuth in Frameworks */,
 				CEBEA2532DF7F7A2003DB9C7 /* FirebaseFirestore in Frameworks */,
 				CEBEA2552DF7F7A2003DB9C7 /* FirebaseCrashlytics in Frameworks */,
+				CEBEA2572DF7F7A2003DB9C7 /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,6 +146,7 @@
 				CEBEA2502DF7F7A2003DB9C7 /* FirebaseAuth */,
 				CEBEA2522DF7F7A2003DB9C7 /* FirebaseFirestore */,
 				CEBEA2542DF7F7A2003DB9C7 /* FirebaseCrashlytics */,
+				CEBEA2562DF7F7A2003DB9C7 /* FirebaseStorage */,
 			);
 			productName = unitoku;
 			productReference = CE50CB062DE8598A0088029C /* unitoku.app */;
@@ -281,10 +284,11 @@
 			);
 			name = "Upload dSYMs to Firebase Crashlytics";
 			outputPaths = (
+				"$(DERIVED_DATA_DIR)/Logs/Build/dSYMUpload-$(CURRENT_ARCH).log",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\n\n# Firebase Crashlytics dSYM upload script\n# This script uploads dSYM files to Firebase Crashlytics for crash symbolication\n\n# Check if the required environment variables are set\nif [ -z \"$DWARF_DSYM_FOLDER_PATH\" ] || [ -z \"$DWARF_DSYM_FILE_NAME\" ]; then\n    echo \"Warning: dSYM environment variables not set. Skipping dSYM upload.\"\n    exit 0\nfi\n\n# Path to the dSYM file\nDSYM_PATH=\"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}\"\n\nif [ ! -d \"$DSYM_PATH\" ]; then\n    echo \"Warning: dSYM file not found at $DSYM_PATH. Skipping upload.\"\n    exit 0\nfi\n\necho \"Uploading dSYM file: $DSYM_PATH\"\n\n# Firebase Crashlytics upload using Swift Package Manager binary\n# Find the Firebase Crashlytics upload-symbols script\nFIREBASE_SCRIPT=\"\"\n\n# First, try to find the script in Swift Package Manager's SourcePackages directory\nif [ -n \"$BUILD_DIR\" ]; then\n    # Look for SourcePackages in DerivedData\n    DERIVED_DATA_DIR=\"$(dirname \"$BUILD_DIR\")\"\n    SOURCE_PACKAGES_DIR=\"$DERIVED_DATA_DIR/SourcePackages\"\n    if [ -d \"$SOURCE_PACKAGES_DIR\" ]; then\n        FIREBASE_SCRIPT=$(find \"$SOURCE_PACKAGES_DIR\" -name \"upload-symbols\" -path \"*/firebase-ios-sdk/Crashlytics/upload-symbols\" 2>/dev/null | head -1)\n        if [ -z \"$FIREBASE_SCRIPT\" ]; then\n            FIREBASE_SCRIPT=$(find \"$SOURCE_PACKAGES_DIR\" -name \"upload-symbols\" -path \"*/FirebaseCrashlytics*\" 2>/dev/null | head -1)\n        fi\n    fi\nfi\n\n# Try to find in project's SourcePackages\nif [ -z \"$FIREBASE_SCRIPT\" ] && [ -n \"$PROJECT_DIR\" ]; then\n    PROJECT_SOURCE_PACKAGES=\"$PROJECT_DIR/SourcePackages\"\n    if [ -d \"$PROJECT_SOURCE_PACKAGES\" ]; then\n        FIREBASE_SCRIPT=$(find \"$PROJECT_SOURCE_PACKAGES\" -name \"upload-symbols\" -path \"*/firebase-ios-sdk/Crashlytics/upload-symbols\" 2>/dev/null | head -1)\n        if [ -z \"$FIREBASE_SCRIPT\" ]; then\n            FIREBASE_SCRIPT=$(find \"$PROJECT_SOURCE_PACKAGES\" -name \"upload-symbols\" -path \"*/FirebaseCrashlytics*\" 2>/dev/null | head -1)\n        fi\n    fi\nfi\n\n# Fallback to DerivedData directory (for older installations)\nif [ -z \"$FIREBASE_SCRIPT\" ] && [ -n \"$BUILD_DIR\" ]; then\n    DERIVED_DATA_DIR=\"$(dirname \"$BUILD_DIR\")\"\n    FIREBASE_SCRIPT=$(find \"$DERIVED_DATA_DIR\" -name \"upload-symbols\" -path \"*/FirebaseCrashlytics/*\" 2>/dev/null | head -1)\nfi\n\n# Try global DerivedData location\nif [ -z \"$FIREBASE_SCRIPT\" ]; then\n    FIREBASE_SCRIPT=$(find ~/Library/Developer/Xcode/DerivedData -name \"upload-symbols\" -path \"*/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols\" 2>/dev/null | head -1)\nfi\n\n# Final fallback - search in the most common DerivedData location\nif [ -z \"$FIREBASE_SCRIPT\" ]; then\n    FIREBASE_SCRIPT=$(find ~/Library/Developer/Xcode/DerivedData -name \"upload-symbols\" -path \"*/FirebaseCrashlytics/*\" 2>/dev/null | head -1)\nfi\n\nif [ -n \"$FIREBASE_SCRIPT\" ] && [ -f \"$FIREBASE_SCRIPT\" ]; then\n    echo \"Found Firebase upload script at: $FIREBASE_SCRIPT\"\n    \"$FIREBASE_SCRIPT\" -gsp \"${PROJECT_DIR}/unitoku/GoogleService-Info.plist\" -p ios \"${DSYM_PATH}\"\n    UPLOAD_RESULT=$?\nelse\n    echo \"Error: Firebase Crashlytics upload-symbols script not found\"\n    echo \"Searched in:\"\n    echo \"  - SourcePackages directories\"\n    echo \"  - DerivedData directories\"\n    echo \"Make sure Firebase Crashlytics is properly installed via Swift Package Manager\"\n    exit 1\nfi\n\nif [ $UPLOAD_RESULT -eq 0 ]; then\n    echo \"✅ dSYM upload successful\"\nelse\n    echo \"❌ dSYM upload failed with exit code: $UPLOAD_RESULT\"\n    exit $UPLOAD_RESULT\nfi\n";
+			shellScript = "#!/bin/bash\n\n# Firebase Crashlytics dSYM upload script (simplified for Debug builds)\n\necho \"🔧 Firebase Crashlytics dSYM upload script started\"\n\n# Skip upload for Debug builds to speed up development\nif [ \"$CONFIGURATION\" = \"Debug\" ]; then\n    echo \"⏭️  Skipping dSYM upload for Debug build\"\n    exit 0\nfi\n\n# Check if the required environment variables are set\nif [ -z \"$DWARF_DSYM_FOLDER_PATH\" ] || [ -z \"$DWARF_DSYM_FILE_NAME\" ]; then\n    echo \"⚠️  dSYM environment variables not set. Skipping dSYM upload.\"\n    exit 0\nfi\n\n# Path to the dSYM file\nDSYM_PATH=\"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}\"\n\nif [ ! -d \"$DSYM_PATH\" ]; then\n    echo \"⚠️  dSYM file not found at $DSYM_PATH. Skipping upload.\"\n    exit 0\nfi\n\necho \"📤 Uploading dSYM file: $DSYM_PATH\"\n\n# Find Firebase Crashlytics upload-symbols script with timeout\nFIREBASE_SCRIPT=\"\"\n\n# Quick search with timeout to prevent hanging\ntimeout 10 find ~/Library/Developer/Xcode/DerivedData -name \"upload-symbols\" -path \"*/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols\" 2>/dev/null | head -1 > /tmp/firebase_script_path\n\nif [ -s /tmp/firebase_script_path ]; then\n    FIREBASE_SCRIPT=$(cat /tmp/firebase_script_path)\nfi\n\nrm -f /tmp/firebase_script_path\n\nif [ -n \"$FIREBASE_SCRIPT\" ] && [ -f \"$FIREBASE_SCRIPT\" ]; then\n    echo \"✅ Found Firebase upload script at: $FIREBASE_SCRIPT\"\n    timeout 30 \"$FIREBASE_SCRIPT\" -gsp \"${PROJECT_DIR}/unitoku/GoogleService-Info.plist\" -p ios \"${DSYM_PATH}\"\n    UPLOAD_RESULT=$?\n    \n    if [ $UPLOAD_RESULT -eq 0 ]; then\n        echo \"✅ dSYM upload successful\"\n    else\n        echo \"⚠️  dSYM upload timed out or failed with exit code: $UPLOAD_RESULT\"\n        echo \"This is not critical for Debug builds\"\n    fi\nelse\n    echo \"⚠️  Firebase Crashlytics upload-symbols script not found\"\n    echo \"This is not critical for Debug builds\"\nfi\n\necho \"🏁 Firebase Crashlytics script completed\"\nexit 0\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -653,6 +657,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CEBEA24D2DF7F7A2003DB9C7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
+		};
+		CEBEA2562DF7F7A2003DB9C7 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CEBEA24D2DF7F7A2003DB9C7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -3,6 +3,7 @@ import CoreData
 
 struct MainTabView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var syncManager: SyncManager
     @State private var selectedTab = 0
     @State private var navigateToPostId: UUID? = nil
     @State private var isShowingPostDetail = false
