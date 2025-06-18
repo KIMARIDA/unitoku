@@ -1,6 +1,7 @@
 import SwiftUI
 import CoreData
 import Firebase
+import FirebaseFirestore
 
 struct PostDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -562,6 +563,7 @@ extension PostDetailView {
 
 // Firestore 알림 전송 함수
 func sendNotificationToUser(userId: String, type: String, title: String, message: String, relatedPostId: UUID) {
+    // Firestore에 알림 문서 저장
     let db = FirebaseManager.shared.getFirestore()
     let notificationData: [String: Any] = [
         "userId": userId,
@@ -577,7 +579,15 @@ func sendNotificationToUser(userId: String, type: String, title: String, message
         if let error = error {
             print("Error sending notification: \(error)")
         } else {
-            print("Notification sent successfully")
+            print("Notification sent successfully to Firestore")
+            
+            // FCM 푸시 알림 전송 (클라이언트 측에서 직접 전송)
+            FCMService.shared.sendNotificationToUser(
+                userId: userId,
+                title: title,
+                message: message,
+                data: ["type": type, "postId": relatedPostId.uuidString]
+            )
         }
     }
 }

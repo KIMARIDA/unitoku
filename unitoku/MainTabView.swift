@@ -94,19 +94,26 @@ struct TimeTableView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // 時間割表示
-                ScrollView {
-                    timeTableContent
+            ZStack {
+                VStack(spacing: 0) {
+                    // 時間割表示
+                    ScrollView {
+                        timeTableContent
+                    }
+                    
+                    // コース一覧ボタン
+                    courseListButton
                 }
-                
-                // コース一覧ボタン
-                courseListButton
-            }
             .navigationTitle("時間割")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     editButton
+                }
+            }
+            .onAppear {
+                // ログインユーザーの時間割をロード
+                if let userId = UserDefaults.standard.string(forKey: "currentUserId") {
+                    viewModel.listenToUserCourses(userId: userId)
                 }
             }
             .sheet(isPresented: $showingNewCourseSheet) {
@@ -121,6 +128,7 @@ struct TimeTableView: View {
             }
             .sheet(isPresented: $showingCourseList) {
                 CourseListView(viewModel: viewModel)
+            }
             }
         }
     }
@@ -318,226 +326,13 @@ struct TimeTableView: View {
             }
             
             Button(role: .destructive, action: {
-                viewModel.deleteCourse(course)
+                viewModel.deleteCourse(courseId: course.id)
             }) {
                 Label("削除", systemImage: "trash")
             }
         }
     }
 }
-
-// 授業詳細画面
-struct CourseDetailView: View {
-    let course: Course
-    let viewModel: TimeTableViewModel
-    @Environment(\.presentationMode) var presentationMode
-    @State private var showingEditSheet = false
-    @State private var editingCourse: Course
-    
-    init(course: Course, viewModel: TimeTableViewModel) {
-        self.course = course
-        self.viewModel = viewModel
-        self._editingCourse = State(initialValue: course)
-    }
-    
-    var body: some View {
-        NavigationView {
-            List {
-                Section(header: Text("授業情報")) {
-                    HStack {
-                        Text("授業名")
-                        Spacer()
-                        Text(course.name)
-                            .foregroundColor(.gray)
-                    }
-                    
-                    HStack {
-                        Text("教授")
-                        Spacer()
-                        Text(course.professor)
-                            .foregroundColor(.gray)
-                    }
-                    
-                    HStack {
-                        Text("教室")
-                        Spacer()
-                        Text(course.room)
-                            .foregroundColor(.gray)
-                    }
-                }
-                
-                Section(header: Text("時間")) {
-                    HStack {
-                        Text("曜日")
-                        Spacer()
-                        Text(course.weekday.rawValue + "曜日")
-                            .foregroundColor(.gray)
-                    }
-                    
-                    HStack {
-                        Text("時限")
-                        Spacer()
-                        Text("\(course.period.rawValue)限 (\(course.period.timeRange))")
-                            .foregroundColor(.gray)
-                    }
-                }
-            }
-            .listStyle(InsetGroupedListStyle())
-            .navigationTitle(course.name)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingEditSheet = true
-                    }) {
-                        Text("編集")
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Text("閉じる")
-                    }
-                }
-            }
-            .sheet(isPresented: $showingEditSheet) {
-                CourseFormView(course: $editingCourse, viewModel: viewModel, isEditing: true) { success in
-                    if success {
-                        viewModel.updateCourse(editingCourse)
-                        showingEditSheet = false
-                    }
-                }
-            }
-        }
-    }
-}
-
-// 授業作成・編集フォーム
-struct CourseFormView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @Binding var course: Course
-    let viewModel: TimeTableViewModel
-    let isEditing: Bool
-    let onSave: (Bool) -> Void
-    
-    @State private var name: String = ""
-    @State private var professor: String = ""
-    @State private var room: String = ""
-    @State private var weekday: Weekday = .monday
-    @State private var period: Period = .first
-    @State private var color: Color = .blue
-    
-    init(course: Binding<Course>, viewModel: TimeTableViewModel, isEditing: Bool, onSave: @escaping (Bool) -> Void = {_ in}) {
-        self._course = course
-        self.viewModel = viewModel
-        self.isEditing = isEditing
-        self.onSave = onSave
-        
-        _name = State(initialValue: course.wrappedValue.name)
-        _professor = State(initialValue: course.wrappedValue.professor)
-        _room = State(initialValue: course.wrappedValue.room)
-        _weekday = State(initialValue: course.wrappedValue.weekday)
-        _period = State(initialValue: course.wrappedValue.period)
-        _color = State(initialValue: course.wrappedValue.color)
-    }
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("授業情報")) {
-                    TextField("授業名", text: $name)
-                    TextField("教授名", text: $professor)
-                    TextField("教室", text: $room)
-                }
-                
-                Section(header: Text("時間")) {
-                    Picker("曜日", selection: $weekday) {
-                        ForEach(Weekday.allCases) { day in
-                            Text(day.rawValue + "曜日").tag(day)
-                        }
-                    }
-                    
-                    Picker("時限", selection: $period) {
-                        ForEach(Period.allCases) { period in
-                            Text("\(period.rawValue)限 (\(period.timeRange))").tag(period)
-                        }
-                    }
-                }
-                
-                Section(header: Text("色")) {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 10) {
-                        ForEach(Course.colors, id: \.self) { colorOption in
-                            ZStack {
-                                Circle()
-                                    .fill(colorOption)
-                                    .frame(width: 30, height: 30)
-                                
-                                if colorOption == color {
-                                    Circle()
-                                        .strokeBorder(Color.white, lineWidth: 2)
-                                        .frame(width: 30, height: 30)
-                                    
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(.white)
-                                }
-                            }
-                            .onTapGesture {
-                                color = colorOption
-                            }
-                            .padding(5)
-                        }
-                    }
-                }
-                
-                if isEditing {
-                    Section {
-                        Button(action: {
-                            viewModel.deleteCourse(course)
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            HStack {
-                                Spacer()
-                                Text("授業を削除")
-                                    .foregroundColor(.red)
-                                Spacer()
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle(isEditing ? "授業を編集" : "新しい授業")
-            .navigationBarItems(
-                leading: Button("キャンセル") {
-                    presentationMode.wrappedValue.dismiss()
-                },
-                trailing: Button("保存") {
-                    saveCourse()
-                }
-                .disabled(name.isEmpty)
-            )
-        }
-    }
-    
-    private func saveCourse() {
-        course.name = name
-        course.professor = professor
-        course.room = room
-        course.weekday = weekday
-        course.period = period
-        course.color = color
-        
-        if !isEditing {
-            viewModel.addCourse(course)
-        }
-        
-        onSave(true)
-        presentationMode.wrappedValue.dismiss()
-    }
-}
-
-// プレースホルダービュー - DetailedCourseReviewViewはCourseReviewView.swiftに実装済み
 
 #Preview {
     MainTabView()

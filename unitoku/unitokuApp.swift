@@ -8,12 +8,17 @@ import SwiftUI
 import FirebaseCore
 import FirebaseFirestore
 import FirebaseCrashlytics
+import FirebaseMessaging
+import FirebaseRemoteConfig
+import UserNotifications
 
 @main
 struct unitokuApp: App {
     let persistenceController = PersistenceController.shared
     let syncManager: SyncManager
-
+    let remoteConfigManager = RemoteConfigManager.shared
+    
+    // FCM 권한 및 delegate 설정
     init() {
         // Firebase 초기화
         FirebaseApp.configure()
@@ -42,6 +47,21 @@ struct unitokuApp: App {
                 }
             }
         }
+        
+        // FCM 권한 요청 및 delegate 등록
+        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+        Messaging.messaging().delegate = NotificationDelegate.shared
+        requestFCMPermission()
+    }
+    
+    func requestFCMPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if granted {
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
+        }
     }
     
     var body: some Scene {
@@ -50,5 +70,23 @@ struct unitokuApp: App {
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(syncManager)
         }
+    }
+}
+
+// FCM Delegate 구현
+class NotificationDelegate: NSObject, ObservableObject, UNUserNotificationCenterDelegate, MessagingDelegate {
+    static let shared = NotificationDelegate()
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        print("[FCM] Registration token: \(fcmToken ?? "nil")")
+        // Firestore에 토큰 저장
+        if let token = fcmToken {
+            FirebaseManager.shared.saveFCMToken(token)
+        }
+    }
+    
+    // 포그라운드 알림 처리
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner, .sound, .badge])
     }
 }

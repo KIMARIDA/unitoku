@@ -244,8 +244,11 @@ struct NewPrivateChatView: View {
                 Section {
                     Button("チャットを始める") {
                         if !recipientName.isEmpty {
-                            let roomID = viewModel.createNewPrivateChat(with: recipientName)
-                            isPresented = false
+                            viewModel.createNewPrivateChat(with: recipientName) { roomID in
+                                if roomID != nil {
+                                    isPresented = false
+                                }
+                            }
                         }
                     }
                     .disabled(recipientName.isEmpty)
@@ -292,8 +295,11 @@ struct NewGroupChatView: View {
                 Section {
                     Button("グループ作成") {
                         if !groupName.isEmpty && !members.isEmpty {
-                            let roomID = viewModel.createNewGroupChat(name: groupName, participants: members)
-                            isPresented = false
+                            viewModel.createNewGroupChat(name: groupName, participants: members) { roomID in
+                                if roomID != nil {
+                                    isPresented = false
+                                }
+                            }
                         }
                     }
                     .disabled(groupName.isEmpty || members.isEmpty)

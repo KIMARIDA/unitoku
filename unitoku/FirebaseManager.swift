@@ -456,68 +456,104 @@ extension FirebaseManager {
 
 // MARK: - Chat Management
 extension FirebaseManager {
-    func createChatRoom(name: String, isGroup: Bool, participants: [String]) async throws -> String {
-        let roomData: [String: Any] = [
+    // 채팅방 실시간 구독
+    func observeChatRooms(for userId: String, onUpdate: @escaping ([ChatRoom]) -> Void) -> ListenerRegistration {
+        let query = db.collection("chatRooms").whereField("participants", arrayContains: userId)
+        let listener = query.addSnapshotListener { snapshot, error in
+            guard let documents = snapshot?.documents else {
+                print("[Chat] Failed to fetch chatRooms: \(error?.localizedDescription ?? "Unknown error")")
+                onUpdate([])
+                return
+            }
+            let rooms: [ChatRoom] = documents.compactMap { doc in
+                let data = doc.data()
+                guard let name = data["name"] as? String,
+                      let isGroup = data["isGroup"] as? Bool,
+                      let participants = data["participants"] as? [String],
+                      let lastMessage = data["lastMessage"] as? String,
+                      let lastMessageTime = (data["lastMessageTime"] as? Timestamp)?.dateValue() else { return nil }
+                let unreadCount = data["unreadCount"] as? Int ?? 0
+                return ChatRoom(
+                    id: UUID(uuidString: doc.documentID) ?? UUID(),
+                    name: name,
+                    isGroup: isGroup,
+                    participants: participants,
+                    lastMessage: lastMessage,
+                    lastMessageTime: lastMessageTime,
+                    unreadCount: unreadCount
+                )
+            }
+            onUpdate(rooms)
+        }
+        listeners.append(listener)
+        return listener
+    }
+
+    // 메시지 실시간 구독
+    func observeMessages(roomId: UUID, onUpdate: @escaping ([ChatMessage]) -> Void) -> ListenerRegistration {
+        let listener = db.collection("chatRooms").document(roomId.uuidString).collection("messages").order(by: "timestamp").addSnapshotListener { snapshot, error in
+            guard let documents = snapshot?.documents else {
+                print("[Chat] Failed to fetch messages: \(error?.localizedDescription ?? "Unknown error")")
+                onUpdate([])
+                return
+            }
+            let messages: [ChatMessage] = documents.compactMap { doc in
+                let data = doc.data()
+                guard let content = data["content"] as? String,
+                      let senderID = data["senderID"] as? String,
+                      let timestamp = (data["timestamp"] as? Timestamp)?.dateValue() else { return nil }
+                let isCurrentUser = senderID == self.currentUserId
+                return ChatMessage(
+                    id: UUID(uuidString: doc.documentID) ?? UUID(),
+                    content: content,
+                    senderID: senderID,
+                    isCurrentUser: isCurrentUser,
+                    timestamp: timestamp
+                )
+            }
+            onUpdate(messages)
+        }
+        listeners.append(listener)
+        return listener
+    }
+
+    // 메시지 전송
+    func sendMessage(roomId: UUID, content: String, completion: ((Error?) -> Void)? = nil) {
+        let messageId = UUID().uuidString
+        let messageData: [String: Any] = [
+            "content": content,
+            "senderID": currentUserId,
+            "timestamp": FieldValue.serverTimestamp()
+        ]
+        db.collection("chatRooms").document(roomId.uuidString).collection("messages").document(messageId).setData(messageData) { error in
+            completion?(error)
+        }
+        // 채팅방의 lastMessage, lastMessageTime 업데이트
+        db.collection("chatRooms").document(roomId.uuidString).updateData([
+            "lastMessage": content,
+            "lastMessageTime": FieldValue.serverTimestamp()
+        ])
+    }
+
+    // 채팅방 생성
+    func createChatRoom(name: String, isGroup: Bool, participants: [String], completion: @escaping (UUID?) -> Void) {
+        let roomId = UUID()
+        let data: [String: Any] = [
             "name": name,
             "isGroup": isGroup,
             "participants": participants,
             "lastMessage": "",
             "lastMessageTime": FieldValue.serverTimestamp(),
-            "createdAt": FieldValue.serverTimestamp()
+            "unreadCount": 0
         ]
-        
-        let docRef = try await db.collection("chatRooms").addDocument(data: roomData)
-        return docRef.documentID
-    }
-    
-    func sendMessage(roomId: String, content: String, senderId: String) async throws {
-        let messageData: [String: Any] = [
-            "roomId": roomId,
-            "content": content,
-            "senderID": senderId,
-            "timestamp": FieldValue.serverTimestamp(),
-            "messageType": "text"
-        ]
-        
-        // Add message
-        try await db.collection("messages").addDocument(data: messageData)
-        
-        // Update chat room last message
-        try await db.collection("chatRooms").document(roomId).updateData([
-            "lastMessage": content,
-            "lastMessageTime": FieldValue.serverTimestamp()
-        ])
-    }
-    
-    func listenToMessages(roomId: String, completion: @escaping ([ChatMessage]) -> Void) {
-        let listener = db.collection("messages")
-            .whereField("roomId", isEqualTo: roomId)
-            .order(by: "timestamp", descending: false)
-            .addSnapshotListener { snapshot, error in
-                guard let documents = snapshot?.documents else { return }
-                
-                let messages = documents.compactMap { doc -> ChatMessage? in
-                    let data = doc.data()
-                    guard let content = data["content"] as? String,
-                          let senderId = data["senderID"] as? String else { return nil }
-                    
-                    let timestamp = (data["timestamp"] as? Timestamp)?.dateValue() ?? Date()
-                    let currentUserId = Auth.auth().currentUser?.uid ?? UserDefaults.standard.string(forKey: "currentUserId") ?? ""
-                    
-                    return ChatMessage(
-                        content: content,
-                        senderID: senderId,
-                        isCurrentUser: senderId == currentUserId,
-                        timestamp: timestamp
-                    )
-                }
-                
-                DispatchQueue.main.async {
-                    completion(messages)
-                }
+        db.collection("chatRooms").document(roomId.uuidString).setData(data) { error in
+            if let error = error {
+                print("[Chat] Failed to create chat room: \(error.localizedDescription)")
+                completion(nil)
+            } else {
+                completion(roomId)
             }
-        
-        listeners.append(listener)
+        }
     }
 }
 
@@ -729,4 +765,19 @@ extension Notification.Name {
     static let notificationsUpdated = Notification.Name("notificationsUpdated")
     static let postsUpdated = Notification.Name("postsUpdated")
     static let commentsUpdated = Notification.Name("commentsUpdated")
+}
+
+// MARK: - FCM 토큰 저장
+extension FirebaseManager {
+    func saveFCMToken(_ token: String) {
+        guard let userId = UserDefaults.standard.string(forKey: "currentUserId") else { return }
+        let data: [String: Any] = ["fcmToken": token, "updatedAt": FieldValue.serverTimestamp()]
+        db.collection("users").document(userId).setData(data, merge: true) { error in
+            if let error = error {
+                print("[FCM] 토큰 저장 실패: \(error.localizedDescription)")
+            } else {
+                print("[FCM] 토큰 Firestore 저장 성공")
+            }
+        }
+    }
 }

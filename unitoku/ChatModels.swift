@@ -1,6 +1,8 @@
 import Foundation
 import SwiftUI
 import CoreData
+import FirebaseFirestore
+import FirebaseCore
 
 // Message model
 struct ChatMessage: Identifiable {
@@ -44,99 +46,60 @@ struct ChatRoom: Identifiable {
 class ChatViewModel: ObservableObject {
     @Published var chatRooms: [ChatRoom] = []
     @Published var messages: [UUID: [ChatMessage]] = [:]
-    @Published var currentUserID = UUID().uuidString
+    @Published var currentUserID: String = UserDefaults.standard.string(forKey: "currentUserId") ?? UUID().uuidString
+    
+    private var chatRoomsListener: ListenerRegistration?
+    private var messageListeners: [UUID: ListenerRegistration] = [:]
     
     init() {
-        loadSampleData()
+        observeChatRooms()
     }
     
-    func loadSampleData() {
-        // Create some sample anonymous users
-        let anonymousUser1 = "匿名ユーザー1"
-        let anonymousUser2 = "匿名ユーザー2"
-        let anonymousUser3 = "匿名ユーザー3"
-        
-        // Create sample chat rooms
-        let room1 = ChatRoom(
-            name: "匿名チャット1",
-            isGroup: false,
-            participants: [currentUserID, anonymousUser1],
-            lastMessage: "こんにちは！",
-            lastMessageTime: Date().addingTimeInterval(-3600),
-            unreadCount: 1
-        )
-        
-        let room2 = ChatRoom(
-            name: "授業グループチャット",
-            isGroup: true,
-            participants: [currentUserID, anonymousUser1, anonymousUser2, anonymousUser3],
-            lastMessage: "課題について質問があります",
-            lastMessageTime: Date().addingTimeInterval(-7200),
-            unreadCount: 3
-        )
-        
-        chatRooms = [room1, room2]
-        
-        // Add sample messages
-        messages[room1.id] = [
-            ChatMessage(content: "こんにちは！", senderID: anonymousUser1, isCurrentUser: false, timestamp: Date().addingTimeInterval(-3600)),
-            ChatMessage(content: "初めまして！", senderID: currentUserID, isCurrentUser: true, timestamp: Date().addingTimeInterval(-3500))
-        ]
-        
-        messages[room2.id] = [
-            ChatMessage(content: "みなさん、こんにちは", senderID: anonymousUser1, isCurrentUser: false, timestamp: Date().addingTimeInterval(-8000)),
-            ChatMessage(content: "今日の授業について話しましょう", senderID: anonymousUser2, isCurrentUser: false, timestamp: Date().addingTimeInterval(-7800)),
-            ChatMessage(content: "了解です！", senderID: currentUserID, isCurrentUser: true, timestamp: Date().addingTimeInterval(-7600)),
-            ChatMessage(content: "課題について質問があります", senderID: anonymousUser3, isCurrentUser: false, timestamp: Date().addingTimeInterval(-7200))
-        ]
+    deinit {
+        chatRoomsListener?.remove()
+        messageListeners.values.forEach { $0.remove() }
     }
     
+    // Firestore 채팅방 실시간 구독
+    func observeChatRooms() {
+        chatRoomsListener?.remove()
+        chatRoomsListener = FirebaseManager.shared.observeChatRooms(for: currentUserID) { [weak self] rooms in
+            DispatchQueue.main.async {
+                self?.chatRooms = rooms
+            }
+        }
+    }
+    
+    // Firestore 메시지 실시간 구독
+    func observeMessages(for roomId: UUID) {
+        // 기존 리스너 제거
+        messageListeners[roomId]?.remove()
+        messageListeners[roomId] = FirebaseManager.shared.observeMessages(roomId: roomId) { [weak self] msgs in
+            DispatchQueue.main.async {
+                self?.messages[roomId] = msgs
+            }
+        }
+    }
+    
+    // 메시지 전송
     func sendMessage(content: String, roomID: UUID) {
-        let newMessage = ChatMessage(content: content, senderID: currentUserID, isCurrentUser: true)
-        
-        if messages[roomID] != nil {
-            messages[roomID]?.append(newMessage)
-        } else {
-            messages[roomID] = [newMessage]
-        }
-        
-        // Update last message in chat room
-        if let index = chatRooms.firstIndex(where: { $0.id == roomID }) {
-            var updatedRoom = chatRooms[index]
-            updatedRoom.lastMessage = content
-            updatedRoom.lastMessageTime = Date()
-            chatRooms[index] = updatedRoom
+        FirebaseManager.shared.sendMessage(roomId: roomID, content: content)
+    }
+    
+    // 채팅방 생성 (개인)
+    func createNewPrivateChat(with name: String, completion: @escaping (UUID?) -> Void) {
+        let participants = [currentUserID, name]
+        FirebaseManager.shared.createChatRoom(name: name, isGroup: false, participants: participants) { roomId in
+            completion(roomId)
         }
     }
     
-    func createNewPrivateChat(with name: String) -> UUID {
-        let roomID = UUID()
-        let newRoom = ChatRoom(
-            id: roomID,
-            name: name,
-            isGroup: false,
-            participants: [currentUserID, name]
-        )
-        
-        chatRooms.append(newRoom)
-        messages[roomID] = []
-        return roomID
-    }
-    
-    func createNewGroupChat(name: String, participants: [String]) -> UUID {
+    // 채팅방 생성 (그룹)
+    func createNewGroupChat(name: String, participants: [String], completion: @escaping (UUID?) -> Void) {
         var allParticipants = participants
         allParticipants.append(currentUserID)
-        
-        let roomID = UUID()
-        let newRoom = ChatRoom(
-            id: roomID,
-            name: name,
-            isGroup: true,
-            participants: allParticipants
-        )
-        
-        chatRooms.append(newRoom)
-        messages[roomID] = []
-        return roomID
+        FirebaseManager.shared.createChatRoom(name: name, isGroup: true, participants: allParticipants) { roomId in
+            completion(roomId)
+        }
     }
 }

@@ -218,7 +218,7 @@ struct CourseListView: View {
         withAnimation {
             for index in offsets {
                 let course = filteredCourses[index]
-                viewModel.deleteCourse(course)
+                viewModel.deleteCourse(courseId: course.id)
             }
         }
     }
