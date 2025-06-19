@@ -13,6 +13,10 @@ struct MoreView: View {
     @State private var showNotificationSettings = false
     @State private var showSyncSettings = false
     @State private var showLogoutAlert = false
+    @State private var showMonitoringDashboard = false
+    @State private var showLogViewer = false
+    @State private var showIntegrationTests = false
+    @State private var showMonitoringConfig = false
     
     // User data from UserDefaults
     @State private var username = UserDefaults.standard.string(forKey: "username") ?? "匿名ユーザー"
@@ -101,6 +105,27 @@ struct MoreView: View {
                         showSyncSettings = true
                     }
                     
+                    // モニタリングダッシュボード
+                    SettingsRow(title: "モニタリング", iconName: "chart.xyaxis.line", iconColor: .blue) {
+                        showMonitoringDashboard = true
+                    }
+                    
+                    // ログビューアー
+                    SettingsRow(title: "ログ", iconName: "doc.text.magnifyingglass", iconColor: .purple) {
+                        showLogViewer = true
+                    }
+                    
+                    // 統合テスト (開発用)
+                    #if DEBUG
+                    SettingsRow(title: "統合テスト", iconName: "testtube.2", iconColor: .orange) {
+                        showIntegrationTests = true
+                    }
+                    
+                    SettingsRow(title: "モニタリング設定", iconName: "gear.badge", iconColor: .gray) {
+                        showMonitoringConfig = true
+                    }
+                    #endif
+                    
                     // 버전 정보
                     HStack {
                         Spacer()
@@ -153,6 +178,18 @@ struct MoreView: View {
             }
             .sheet(isPresented: $showSyncSettings) {
                 SyncSettingsView()
+            }
+            .sheet(isPresented: $showMonitoringDashboard) {
+                MonitoringDashboardView()
+            }
+            .sheet(isPresented: $showLogViewer) {
+                LogViewerView()
+            }
+            .sheet(isPresented: $showIntegrationTests) {
+                MonitoringTestView()
+            }
+            .sheet(isPresented: $showMonitoringConfig) {
+                MonitoringConfigurationView()
             }
             .alert(isPresented: $showLogoutAlert) {
                 Alert(

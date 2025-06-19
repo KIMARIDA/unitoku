@@ -42,6 +42,16 @@ struct MainTabView: View {
                     .tag(4)
             }
             .accentColor(Color.appTheme)
+            .onChange(of: selectedTab) { oldValue, newValue in
+                // タブ切り替えのAnalytics記録
+                let tabNames = ["home", "timetable", "course_review", "chat", "more"]
+                if newValue >= 0 && newValue < tabNames.count {
+                    AnalyticsManager.shared.logEvent(.screenView, parameters: [
+                        "from_tab": oldValue < tabNames.count ? tabNames[oldValue] : "unknown",
+                        "to_tab": tabNames[newValue]
+                    ])
+                }
+            }
             .onAppear {
                 // ナビゲーション通知リスナーの設定
                 NotificationCenter.default.addObserver(

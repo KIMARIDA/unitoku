@@ -18,6 +18,10 @@ struct unitokuApp: App {
     let syncManager: SyncManager
     let remoteConfigManager = RemoteConfigManager.shared
     
+    // Analytics and Monitoring services
+    private let analyticsManager = AnalyticsManager.shared
+    private let monitoringService = MonitoringService.shared
+    
     // FCM 권한 및 delegate 설정
     init() {
         // Firebase 초기화
@@ -31,6 +35,14 @@ struct unitokuApp: App {
         Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(true)
         print("✅ Crashlytics enabled for Release builds")
         #endif
+
+        // Analytics와 Monitoring services are automatically initialized when accessed
+        
+        // App launch 이벤트 기록
+        analyticsManager.logEvent(.sessionStart, parameters: [
+            "app_version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown",
+            "build_number": Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
+        ])
 
         // 반드시 Firebase 초기화 이후에 싱크 매니저 생성
         self.syncManager = SyncManager.shared

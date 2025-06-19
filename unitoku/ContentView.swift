@@ -95,9 +95,23 @@ struct ContentView: View {
 
             do {
                 try viewContext.save()
+                
+                // Analytics イベントログ
+                AnalyticsManager.shared.logEvent(.postCreate, parameters: [
+                    "content_length": newPostContent.count
+                ])
+                
                 newPostContent = "" // 投稿後に入力フィールドを初期化
             } catch {
                 let nsError = error as NSError
+                
+                // Analytics エラーログ
+                AnalyticsManager.shared.logEvent(.errorOccurred, parameters: [
+                    "error_message": nsError.localizedDescription,
+                    "error_code": nsError.code,
+                    "context": "post_creation"
+                ])
+                
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
         }
@@ -109,8 +123,22 @@ struct ContentView: View {
 
             do {
                 try viewContext.save()
+                
+                // Analytics イベントログ
+                AnalyticsManager.shared.logEvent(.postDelete, parameters: [
+                    "posts_count": offsets.count
+                ])
+                
             } catch {
                 let nsError = error as NSError
+                
+                // Analytics エラーログ
+                AnalyticsManager.shared.logEvent(.errorOccurred, parameters: [
+                    "error_message": nsError.localizedDescription,
+                    "error_code": nsError.code,
+                    "context": "post_deletion"
+                ])
+                
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
         }

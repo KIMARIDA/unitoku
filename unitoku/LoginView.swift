@@ -142,13 +142,30 @@ struct LoginView: View {
             showingAlert = true
             return
         }
-        // 실제 Firebase 인증 사용
+        // 実際 Firebase 인증 사용
         Task {
+            // ログイン試行のAnalytics記録
+            AnalyticsManager.shared.logEvent(.userLogin, parameters: [
+                "email_domain": String(email.split(separator: "@").last ?? "unknown"),
+                "login_attempt": true
+            ])
+            
             let result = await NetworkService.shared.login(email: email, password: password)
             switch result {
             case .success(_):
+                // ログイン成功のAnalytics記録
+                AnalyticsManager.shared.logEvent(.userLogin, parameters: [
+                    "login_status": "success"
+                ])
+                
                 isLoggedIn = true
             case .failure(let error):
+                // ログイン失敗のAnalytics記録
+                AnalyticsManager.shared.logEvent(.errorOccurred, parameters: [
+                    "error_type": error.message,
+                    "context": "login_failure"
+                ])
+                
                 alertMessage = error.message
                 showingAlert = true
             }
